@@ -1,0 +1,120 @@
+# TMF8806 Register Definitions
+# Extracted from datasheet DS001097 v4-00
+
+## Common Registers (Always Available)
+| Addr | Name            | R/W | Description                                    |
+|------|-----------------|-----|------------------------------------------------|
+| 0x00 | APPID           | RW  | Currently running application (0xC0=App0, 0x80=Bootloader) |
+| 0x01 | APPREV_MAJOR    | RW  | Application major revision                     |
+| 0x02 | APPREQID        | RW  | Application to start (0x80=bootloader, 0xC0=App0) |
+| 0xE0 | ENABLE          | RW  | Enable register (PON, cpu_ready, cpu_reset)    |
+| 0xE1 | INT_STATUS      | RW  | Interrupt status (int1, int2)                  |
+| 0xE2 | INT_ENAB        | RW  | Interrupt enable (int1_enab, int2_enab)        |
+| 0xE3 | ID              | RO  | Chip ID (reads 0x09)                           |
+| 0xE4 | REVID           | RO  | Chip revision ID                               |
+
+## App0 Registers (When appid=0xC0)
+| Addr | Name            | R/W | Description                                    |
+|------|-----------------|-----|------------------------------------------------|
+| 0x06 | CMD_DATA9       | W   | Command data byte 9                            |
+| 0x07 | CMD_DATA8       | W   | Command data byte 8                            |
+| 0x08 | CMD_DATA7       | W   | Command data byte 7                            |
+| 0x09 | CMD_DATA6       | W   | Command data byte 6                            |
+| 0x0A | CMD_DATA5       | W   | Command data byte 5                            |
+| 0x0B | CMD_DATA4       | W   | Command data byte 4                            |
+| 0x0C | CMD_DATA3       | W   | Command data byte 3                            |
+| 0x0D | CMD_DATA2       | W   | Command data byte 2                            |
+| 0x0E | CMD_DATA1       | W   | Command data byte 1                            |
+| 0x0F | CMD_DATA0       | W   | Command data byte 0                            |
+| 0x10 | COMMAND         | RO  | Command execution (0x00 when complete)         |
+| 0x11 | PREVIOUS        | RO  | Previous/current command                       |
+| 0x12 | APPREV_MINOR    | RO  | Application minor revision                     |
+| 0x13 | APPREV_PATCH    | RO  | Application patch number                       |
+| 0x1C | STATE           | RO  | State of operation (2=error, other=ok)         |
+| 0x1D | STATUS          | RO  | Status (0x00-0x0F=OK, 0x10-0xFF=Error)         |
+| 0x1E | REGISTER_CONTENTS | RO | Contents type in 0x20-0xDF                    |
+| 0x1F | TID             | RO  | Transaction ID (changes on each update)        |
+
+## Object Detection Results (When register_contents=0x55)
+| Addr | Name            | R/W | Description                                    |
+|------|-----------------|-----|------------------------------------------------|
+| 0x20 | RESULT_NUMBER   | RO  | Result counter                                 |
+| 0x21 | RESULT_INFO     | RO  | measStatus[7:6], reliability[5:0]              |
+| 0x22 | DISTANCE_PEAK_0 | RO  | Distance LSB (mm)                              |
+| 0x23 | DISTANCE_PEAK_1 | RO  | Distance MSB (mm)                              |
+| 0x24 | SYS_CLOCK_0     | RO  | System clock byte 0 (0.213µs units)            |
+| 0x25 | SYS_CLOCK_1     | RO  | System clock byte 1                            |
+| 0x26 | SYS_CLOCK_2     | RO  | System clock byte 2                            |
+| 0x27 | SYS_CLOCK_3     | RO  | System clock byte 3                            |
+| 0x28-0x32 | STATE_DATA_0-10 | RO | Algorithm state data (11 bytes)            |
+| 0x33 | TEMPERATURE     | RO  | Die temperature (signed, °C)                   |
+| 0x34 | REFERENCE_HITS_0| RO  | Reference SPAD hits byte 0                     |
+| 0x35 | REFERENCE_HITS_1| RO  | Reference SPAD hits byte 1                     |
+| 0x36 | REFERENCE_HITS_2| RO  | Reference SPAD hits byte 2                     |
+| 0x37 | REFERENCE_HITS_3| RO  | Reference SPAD hits byte 3                     |
+| 0x38 | OBJECT_HITS_0   | RO  | Object SPAD hits byte 0                        |
+| 0x39 | OBJECT_HITS_1   | RO  | Object SPAD hits byte 1                        |
+| 0x3A | OBJECT_HITS_2   | RO  | Object SPAD hits byte 2                        |
+| 0x3B | OBJECT_HITS_3   | RO  | Object SPAD hits byte 3                        |
+| 0x3C | XTALK_LSB       | RO  | Crosstalk peak value LSB                       |
+| 0x3D | XTALK_MSB       | RO  | Crosstalk peak value MSB                       |
+
+## Calibration Data Write (Before command 0x02 with factoryCal=1)
+| Addr | Name            | R/W | Description                                    |
+|------|-----------------|-----|------------------------------------------------|
+| 0x20-0x2D | FACTORY_CALIB_0-13 | RW | Factory calibration data (14 bytes)       |
+| 0x2E-0x38 | STATE_DATA_WR_0-10 | RW | Algorithm state data write (11 bytes)     |
+
+## Interrupt Suppression (After command 0x09)
+| Addr | Name                | R/W | Description                                |
+|------|---------------------|-----|--------------------------------------------|
+| 0x20 | PERSISTENCE         | RW  | Detection persistence count                |
+| 0x21 | LOW_THRESHOLD_LSB   | RW  | Low threshold LSB (mm)                     |
+| 0x22 | LOW_THRESHOLD_MSB   | RW  | Low threshold MSB (mm)                     |
+| 0x23 | HIGH_THRESHOLD_LSB  | RW  | High threshold LSB (mm)                    |
+| 0x24 | HIGH_THRESHOLD_MSB  | RW  | High threshold MSB (mm)                    |
+
+## Serial Number (After command 0x47, register_contents=0x47)
+| Addr | Name                    | R/W | Description                            |
+|------|-------------------------|-----|----------------------------------------|
+| 0x28 | SERIAL_NUMBER_0         | RO  | Serial number byte 0                   |
+| 0x29 | SERIAL_NUMBER_1         | RO  | Serial number byte 1                   |
+| 0x2A | IDENTIFICATION_NUMBER_0 | RO  | Identification number byte 0           |
+| 0x2B | IDENTIFICATION_NUMBER_1 | RO  | Identification number byte 1           |
+
+## Histogram Data (When register_contents=0x80-0x93)
+| Addr | Name            | R/W | Description                                    |
+|------|-----------------|-----|------------------------------------------------|
+| 0x20-0x9F | HISTOGRAM   | RO  | 128 bytes of histogram data (quarter)          |
+
+## Bootloader Registers (When appid=0x80)
+| Addr | Name            | R/W | Description                                    |
+|------|-----------------|-----|------------------------------------------------|
+| 0x08 | BL_CMD_STAT     | RW  | Bootloader command/status                      |
+| 0x09 | BL_SIZE         | RW  | Data size in bytes (0-128)                     |
+| 0x0A-0x89 | BL_DATA     | RW  | Up to 128 data bytes                           |
+| After data | BL_CSUM    | RW  | Checksum (Sum XOR 0xFF)                        |
+
+## Commands (Write to 0x10)
+| Value | Name                | Description                                    |
+|-------|---------------------|------------------------------------------------|
+| 0x00  | NO_COMMAND          | No command                                     |
+| 0x02  | START_MEASUREMENT   | Start measurement with config                  |
+| 0x08  | WRITE_CONFIG        | Write additional configuration (persistence)  |
+| 0x09  | READ_CONFIG         | Read additional configuration                  |
+| 0x0A  | FACTORY_CALIBRATION | Perform factory calibration                    |
+| 0x0F  | GPIO_CONTROL        | Set GPIO control                               |
+| 0x30  | ENABLE_HISTOGRAM    | Enable histogram readout                       |
+| 0x32  | CONTINUE_HISTOGRAM  | Continue after histogram read                  |
+| 0x47  | READ_SERIAL         | Read serial number                             |
+| 0x49  | CHANGE_I2C_ADDR     | Change I2C address                             |
+| 0x80  | READ_HISTOGRAM      | Start histogram readout                        |
+| 0xFF  | STOP                | Stop operation                                 |
+
+## Bootloader Commands (Write to 0x08)
+| Value | Name            | Description                                    |
+|-------|-----------------|------------------------------------------------|
+| 0x11  | RAMREMAP_RESET  | Remap RAM to 0 and reset                       |
+| 0x14  | DOWNLOAD_INIT   | Initialize for RAM download                    |
+| 0x41  | W_RAM           | Write RAM region                               |
+| 0x43  | ADDR_RAM        | Set RAM pointer address                        |
