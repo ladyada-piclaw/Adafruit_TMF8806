@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['tmf8806_5fgpio_5fdisabled',['TMF8806_GPIO_DISABLED',['../_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37a677058650f227042c06df024788c613b',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fgpio_5finput_5factive_5fhigh',['TMF8806_GPIO_INPUT_ACTIVE_HIGH',['../_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37acf91552b4b5e9e197114cc2c23641507',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fgpio_5finput_5factive_5flow',['TMF8806_GPIO_INPUT_ACTIVE_LOW',['../_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37a1a83721f0af32dd090d2418999b8489f',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fgpio_5fod_5fdetect_5flow',['TMF8806_GPIO_OD_DETECT_LOW',['../_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37ade4c3a511f24d8a5a961f4cd58a1e2a1',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fgpio_5fod_5fno_5fdetect_5flow',['TMF8806_GPIO_OD_NO_DETECT_LOW',['../_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37a7ac05fb4e30b3ca72907102d4effe7c4',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fgpio_5foutput_5fdetect_5fhigh',['TMF8806_GPIO_OUTPUT_DETECT_HIGH',['../_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37a1c7f41cda894dad1ae0876b73c81bbb3',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fgpio_5foutput_5fdetect_5flow',['TMF8806_GPIO_OUTPUT_DETECT_LOW',['../_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37add5da45c45a61aaf2823e011e5446982',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fgpio_5foutput_5fhigh',['TMF8806_GPIO_OUTPUT_HIGH',['../_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37a4b665ccb2b037ebc991acbb4867230ee',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fgpio_5foutput_5flow',['TMF8806_GPIO_OUTPUT_LOW',['../_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37a6379371f7808f9d2efa3f87fb36399ea',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fgpio_5foutput_5fvcsel_5fpulse',['TMF8806_GPIO_OUTPUT_VCSEL_PULSE',['../_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37a3c2a497b7af3eca208f3292f8e02181a',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fmode_5f2_5f5m',['TMF8806_MODE_2_5M',['../_adafruit___t_m_f8806_8h.html#a0d45215ad86a2319d02c31749401e263a8e86908bed0384a6e43fef5833cdc011',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fmode_5f5m',['TMF8806_MODE_5M',['../_adafruit___t_m_f8806_8h.html#a0d45215ad86a2319d02c31749401e263aa9a81db101444e726d9acf6e6beaaa2e',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fmode_5fshort_5frange',['TMF8806_MODE_SHORT_RANGE',['../_adafruit___t_m_f8806_8h.html#a0d45215ad86a2319d02c31749401e263a918b37bd552c41548b39683e48367fe5',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5fdeadtime_5f12ns',['TMF8806_SPAD_DEADTIME_12NS',['../_adafruit___t_m_f8806_8h.html#a097dcdab40e360edfbc4c797186a751ca0c75ca1a9681e7cc4139625ffd145179',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5fdeadtime_5f16ns',['TMF8806_SPAD_DEADTIME_16NS',['../_adafruit___t_m_f8806_8h.html#a097dcdab40e360edfbc4c797186a751ca8af6b32a4e0f7f451cbd54450bf4feb3',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5fdeadtime_5f24ns',['TMF8806_SPAD_DEADTIME_24NS',['../_adafruit___t_m_f8806_8h.html#a097dcdab40e360edfbc4c797186a751ca5995e4ef17a26ffc65623ec9a4e8775d',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5fdeadtime_5f32ns',['TMF8806_SPAD_DEADTIME_32NS',['../_adafruit___t_m_f8806_8h.html#a097dcdab40e360edfbc4c797186a751ca630d0402148ed1e8f5170fcca98116df',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5fdeadtime_5f48ns',['TMF8806_SPAD_DEADTIME_48NS',['../_adafruit___t_m_f8806_8h.html#a097dcdab40e360edfbc4c797186a751cad7505b4fae31994d86f43b88f620d979',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5fdeadtime_5f4ns',['TMF8806_SPAD_DEADTIME_4NS',['../_adafruit___t_m_f8806_8h.html#a097dcdab40e360edfbc4c797186a751ca8c5dbeb9f22b22fe8fbe3505e2b57a08',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5fdeadtime_5f8ns',['TMF8806_SPAD_DEADTIME_8NS',['../_adafruit___t_m_f8806_8h.html#a097dcdab40e360edfbc4c797186a751caea90713e4182cb229d2ae33435aa7e4a',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5fdeadtime_5f97ns',['TMF8806_SPAD_DEADTIME_97NS',['../_adafruit___t_m_f8806_8h.html#a097dcdab40e360edfbc4c797186a751cafb16e7a1e6e36473bc0976a4ce82dc43',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5fdefault',['TMF8806_SPAD_DEFAULT',['../_adafruit___t_m_f8806_8h.html#a980ecb629829da0c0ec0e7a9469b61dcabb8948afdf10a9e071176641774754b0',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5flarge_5fairgap',['TMF8806_SPAD_LARGE_AIRGAP',['../_adafruit___t_m_f8806_8h.html#a980ecb629829da0c0ec0e7a9469b61dca27ab8a82437bbfda65c5991e3a8a999e',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fspad_5fthick_5fglass',['TMF8806_SPAD_THICK_GLASS',['../_adafruit___t_m_f8806_8h.html#a980ecb629829da0c0ec0e7a9469b61dcaa7576b13fbc22ca7a911f9bdaae5e9fe',1,'Adafruit_TMF8806.h']]]
+];
