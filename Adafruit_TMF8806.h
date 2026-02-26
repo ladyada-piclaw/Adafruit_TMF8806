@@ -36,6 +36,7 @@
 #define TMF8806_REG_INT_STATUS 0xE1   ///< Interrupt status
 #define TMF8806_REG_INT_ENAB 0xE2     ///< Interrupt enable
 #define TMF8806_REG_ID 0xE3           ///< Chip ID register
+#define TMF8806_REG_REVID 0xE4        ///< Chip revision ID register
 
 // Application IDs
 #define TMF8806_APP_BOOTLOADER 0x80  ///< Bootloader app ID
@@ -160,6 +161,7 @@ class Adafruit_TMF8806 {
 
   // Info
   uint8_t getChipID();
+  uint8_t getRevisionID();
   int8_t getTemperature();
   void getVersion(uint8_t* major, uint8_t* minor, uint8_t* patch);
   bool readSerialNumber(uint8_t* serial, uint8_t len);

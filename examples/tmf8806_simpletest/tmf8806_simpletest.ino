@@ -28,10 +28,12 @@ void setup() {
   }
   Serial.println(F("TMF8806 found!"));
 
-  // Print chip ID
+  // Print chip ID and revision
   uint8_t chipId = tof.getChipID();
   Serial.print(F("Chip ID: 0x"));
   Serial.println(chipId, HEX);
+  Serial.print(F("Revision ID: "));
+  Serial.println(tof.getRevisionID());
 
   // Print firmware version
   uint8_t major, minor, patch;

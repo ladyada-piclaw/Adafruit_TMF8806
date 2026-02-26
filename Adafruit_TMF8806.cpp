@@ -506,6 +506,14 @@ uint8_t Adafruit_TMF8806::getChipID() {
 }
 
 /*!
+ * @brief Get chip revision ID
+ * @return Revision ID (bits [2:0] of REVID register)
+ */
+uint8_t Adafruit_TMF8806::getRevisionID() {
+  return readReg(TMF8806_REG_REVID) & 0x07;
+}
+
+/*!
  * @brief Get last measured temperature
  * @return Temperature in degrees Celsius
  */
