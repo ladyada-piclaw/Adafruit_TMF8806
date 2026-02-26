@@ -28,6 +28,7 @@ var searchData=
   ['tmf8806_5freg_5fid',['TMF8806_REG_ID',['../_adafruit___t_m_f8806_8h.html#abb78a5eabd68654b2553d6f6df3b5474',1,'Adafruit_TMF8806.h']]],
   ['tmf8806_5freg_5fint_5fenab',['TMF8806_REG_INT_ENAB',['../_adafruit___t_m_f8806_8h.html#af539599a355ba46d7906fe2185c63099',1,'Adafruit_TMF8806.h']]],
   ['tmf8806_5freg_5fint_5fstatus',['TMF8806_REG_INT_STATUS',['../_adafruit___t_m_f8806_8h.html#a28940255087e367450a996200ed52388',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5freg_5frevid',['TMF8806_REG_REVID',['../_adafruit___t_m_f8806_8h.html#aaaca26f9238c22719c66f20ff252e04b',1,'Adafruit_TMF8806.h']]],
   ['tmf8806_5freg_5fstate',['TMF8806_REG_STATE',['../_adafruit___t_m_f8806_8h.html#a3eb290c0fe6bc4bd5230782d965cee64',1,'Adafruit_TMF8806.h']]],
   ['tmf8806_5freg_5fstatus',['TMF8806_REG_STATUS',['../_adafruit___t_m_f8806_8h.html#a567208ada6315ab22ca89616dd2818e8',1,'Adafruit_TMF8806.h']]]
 ];
