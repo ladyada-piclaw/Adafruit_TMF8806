@@ -65,7 +65,9 @@ bool Adafruit_TMF8806::begin(uint8_t addr, TwoWire* wire) {
   }
 
   // Step 1: Set PON bit to wake up device
-  if (!writeReg(TMF8806_REG_ENABLE, 0x01)) {
+  Adafruit_BusIO_Register enable_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_ENABLE);
+  if (!enable_reg.write(0x01)) {
     return false;
   }
 
@@ -75,7 +77,9 @@ bool Adafruit_TMF8806::begin(uint8_t addr, TwoWire* wire) {
   }
 
   // Step 3: Request measurement application
-  if (!writeReg(TMF8806_REG_APPREQID, TMF8806_APP_MEASUREMENT)) {
+  Adafruit_BusIO_Register appreqid_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_APPREQID);
+  if (!appreqid_reg.write(TMF8806_APP_MEASUREMENT)) {
     return false;
   }
 
@@ -88,10 +92,14 @@ bool Adafruit_TMF8806::begin(uint8_t addr, TwoWire* wire) {
   }
 
   // Step 5: Enable result interrupt (bit 0)
-  if (!writeReg(TMF8806_REG_INT_STATUS, 0x01)) { // Clear first
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
+  if (!int_status_reg.write(0x01)) { // Clear first
     return false;
   }
-  if (!writeReg(TMF8806_REG_INT_ENAB, 0x01)) { // Enable
+  Adafruit_BusIO_Register int_enab_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_ENAB);
+  if (!int_enab_reg.write(0x01)) { // Enable
     return false;
   }
 
@@ -111,14 +119,18 @@ bool Adafruit_TMF8806::begin(uint8_t addr, TwoWire* wire) {
 bool Adafruit_TMF8806::reset() {
   // Write reset bit (bit 7 of ENABLE register triggers soft reset when
   // writing to RESETREASON at 0xF0)
-  if (!writeReg(0xF0, 0x80)) {
+  Adafruit_BusIO_Register resetreason_reg =
+      Adafruit_BusIO_Register(_i2c_dev, 0xF0);
+  if (!resetreason_reg.write(0x80)) {
     return false;
   }
 
   delay(5);
 
   // Re-initialize
-  if (!writeReg(TMF8806_REG_ENABLE, 0x01)) {
+  Adafruit_BusIO_Register enable_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_ENABLE);
+  if (!enable_reg.write(0x01)) {
     return false;
   }
 
@@ -126,7 +138,9 @@ bool Adafruit_TMF8806::reset() {
     return false;
   }
 
-  if (!writeReg(TMF8806_REG_APPREQID, TMF8806_APP_MEASUREMENT)) {
+  Adafruit_BusIO_Register appreqid_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_APPREQID);
+  if (!appreqid_reg.write(TMF8806_APP_MEASUREMENT)) {
     return false;
   }
 
@@ -137,8 +151,12 @@ bool Adafruit_TMF8806::reset() {
   }
 
   // Re-enable interrupts
-  writeReg(TMF8806_REG_INT_STATUS, 0x01);
-  writeReg(TMF8806_REG_INT_ENAB, 0x01);
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
+  int_status_reg.write(0x01);
+  Adafruit_BusIO_Register int_enab_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_ENAB);
+  int_enab_reg.write(0x01);
 
   return true;
 }
@@ -227,7 +245,9 @@ bool Adafruit_TMF8806::startMeasuring(bool continuous) {
  * @return true on success, false on failure
  */
 bool Adafruit_TMF8806::stopMeasuring() {
-  if (!writeReg(TMF8806_REG_COMMAND, TMF8806_CMD_STOP)) {
+  Adafruit_BusIO_Register command_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_COMMAND);
+  if (!command_reg.write(TMF8806_CMD_STOP)) {
     return false;
   }
 
@@ -241,7 +261,9 @@ bool Adafruit_TMF8806::stopMeasuring() {
  * @return true if data ready, false otherwise
  */
 bool Adafruit_TMF8806::dataReady() {
-  uint8_t intStatus = readReg(TMF8806_REG_INT_STATUS);
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
+  uint8_t intStatus = int_status_reg.read();
   return (intStatus & 0x01) != 0;
 }
 
@@ -280,7 +302,9 @@ bool Adafruit_TMF8806::readResult(tmf8806_result_t* result) {
   }
 
   // Clear interrupt
-  writeReg(TMF8806_REG_INT_STATUS, 0x01);
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
+  int_status_reg.write(0x01);
 
   // Parse result from offset 4 (register 0x20)
   // Result structure starts at 0x20, but our buffer starts at 0x1C
@@ -467,7 +491,9 @@ bool Adafruit_TMF8806::getCalibrationData(uint8_t* data, uint8_t len) {
   memcpy(data, &buffer[2], TMF8806_CALIB_DATA_SIZE);
 
   // Clear interrupt
-  writeReg(TMF8806_REG_INT_STATUS, 0x01);
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
+  int_status_reg.write(0x01);
 
   return true;
 }
@@ -502,7 +528,11 @@ void Adafruit_TMF8806::enableCalibration(bool enable) {
  * @return Chip ID (bits [5:0] of register 0xE3)
  */
 uint8_t Adafruit_TMF8806::getChipID() {
-  return readReg(TMF8806_REG_ID) & 0x3F;
+  Adafruit_BusIO_Register id_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_ID);
+  Adafruit_BusIO_RegisterBits chip_id =
+      Adafruit_BusIO_RegisterBits(&id_reg, 6, 0);
+  return chip_id.read();
 }
 
 /*!
@@ -510,7 +540,11 @@ uint8_t Adafruit_TMF8806::getChipID() {
  * @return Revision ID (bits [2:0] of REVID register)
  */
 uint8_t Adafruit_TMF8806::getRevisionID() {
-  return readReg(TMF8806_REG_REVID) & 0x07;
+  Adafruit_BusIO_Register revid_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_REVID);
+  Adafruit_BusIO_RegisterBits rev_id =
+      Adafruit_BusIO_RegisterBits(&revid_reg, 3, 0);
+  return rev_id.read();
 }
 
 /*!
@@ -529,9 +563,16 @@ int8_t Adafruit_TMF8806::getTemperature() {
  */
 void Adafruit_TMF8806::getVersion(uint8_t* major, uint8_t* minor,
                                   uint8_t* patch) {
-  *major = readReg(TMF8806_REG_APPREV_MAJOR);
-  *minor = readReg(TMF8806_REG_APPREV_MINOR);
-  *patch = readReg(TMF8806_REG_APPREV_PATCH);
+  Adafruit_BusIO_Register major_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_APPREV_MAJOR);
+  Adafruit_BusIO_Register minor_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_APPREV_MINOR);
+  Adafruit_BusIO_Register patch_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_APPREV_PATCH);
+
+  *major = major_reg.read();
+  *minor = minor_reg.read();
+  *patch = patch_reg.read();
 }
 
 /*!
@@ -542,7 +583,9 @@ void Adafruit_TMF8806::getVersion(uint8_t* major, uint8_t* minor,
  */
 bool Adafruit_TMF8806::readSerialNumber(uint8_t* serial, uint8_t len) {
   // Send read serial command
-  if (!writeReg(TMF8806_REG_COMMAND, TMF8806_CMD_READ_SERIAL)) {
+  Adafruit_BusIO_Register command_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_COMMAND);
+  if (!command_reg.write(TMF8806_CMD_READ_SERIAL)) {
     return false;
   }
 
@@ -581,9 +624,11 @@ bool Adafruit_TMF8806::readSerialNumber(uint8_t* serial, uint8_t len) {
  * @return true if CPU ready, false on timeout
  */
 bool Adafruit_TMF8806::waitForCpuReady(uint16_t timeoutMs) {
+  Adafruit_BusIO_Register enable_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_ENABLE);
   uint32_t startMs = millis();
   while ((millis() - startMs) < timeoutMs) {
-    uint8_t enable = readReg(TMF8806_REG_ENABLE);
+    uint8_t enable = enable_reg.read();
     // CPU_READY (bit 6) + PON (bit 0) = 0x41
     if ((enable & 0x41) == 0x41) {
       return true;
@@ -599,9 +644,11 @@ bool Adafruit_TMF8806::waitForCpuReady(uint16_t timeoutMs) {
  * @return true if app running, false on timeout
  */
 bool Adafruit_TMF8806::waitForApp(uint16_t timeoutMs) {
+  Adafruit_BusIO_Register appid_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_APPID);
   uint32_t startMs = millis();
   while ((millis() - startMs) < timeoutMs) {
-    uint8_t appId = readReg(TMF8806_REG_APPID);
+    uint8_t appId = appid_reg.read();
     if (appId == TMF8806_APP_MEASUREMENT) {
       return true;
     }
@@ -617,6 +664,8 @@ bool Adafruit_TMF8806::waitForApp(uint16_t timeoutMs) {
  * @return true if command completed, false on timeout/error
  */
 bool Adafruit_TMF8806::executeCommand(uint8_t cmd, uint16_t timeoutMs) {
+  Adafruit_BusIO_Register state_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_STATE);
   uint32_t startMs = millis();
   while ((millis() - startMs) < timeoutMs) {
     uint8_t buffer[2];
@@ -631,7 +680,7 @@ bool Adafruit_TMF8806::executeCommand(uint8_t cmd, uint16_t timeoutMs) {
     }
 
     // Check for error state
-    uint8_t state = readReg(TMF8806_REG_STATE);
+    uint8_t state = state_reg.read();
     if (state == 0x02) { // Error state
       return false;
     }
@@ -639,28 +688,6 @@ bool Adafruit_TMF8806::executeCommand(uint8_t cmd, uint16_t timeoutMs) {
     delayMicroseconds(100);
   }
   return false;
-}
-
-/*!
- * @brief Write a single register
- * @param reg Register address
- * @param value Value to write
- * @return true on success, false on failure
- */
-bool Adafruit_TMF8806::writeReg(uint8_t reg, uint8_t value) {
-  uint8_t buffer[2] = {reg, value};
-  return _i2c_dev->write(buffer, 2);
-}
-
-/*!
- * @brief Read a single register
- * @param reg Register address
- * @return Register value
- */
-uint8_t Adafruit_TMF8806::readReg(uint8_t reg) {
-  uint8_t value = 0;
-  _i2c_dev->write_then_read(&reg, 1, &value, 1);
-  return value;
 }
 
 /*!
