@@ -99,6 +99,14 @@ typedef enum {
 
 /*!
  * @brief GPIO mode selection
+ *
+ * GPIO modes are applied when startMeasuring() is called — they are part
+ * of the measurement command configuration, not a standalone register.
+ *
+ * @note GPIO0 is sampled at startup (EN rising edge) to select the I/O
+ * voltage level (>=1.5V selects 1.8-3.3V mode, <1.5V selects 1.2V mode).
+ * An internal pull-up on GPIO0 may prevent OUTPUT_LOW from driving the pin
+ * fully low after boot. GPIO1 does not have this limitation.
  */
 typedef enum {
   TMF8806_GPIO_DISABLED = 0,           ///< GPIO disabled
