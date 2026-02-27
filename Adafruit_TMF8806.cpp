@@ -35,6 +35,8 @@ Adafruit_TMF8806::Adafruit_TMF8806() {
   _gpio1Mode = 0;
   _useCalibration = false;
   _hasCalibData = false;
+  _useAlgState = false;
+  _hasStateData = false;
   _lastTemperature = 0;
   memset(_calibData, 0, TMF8806_CALIB_DATA_SIZE);
 }
@@ -104,10 +106,22 @@ bool Adafruit_TMF8806::reset() {
 bool Adafruit_TMF8806::startMeasuring(bool continuous) {
   uint8_t cmdData[11];
 
-  // If using calibration, write cal data to 0x20 first
-  if (_useCalibration && _hasCalibData) {
+  // Write cal data and/or algorithm state to 0x20 before command
+  bool useCal = _useCalibration && _hasCalibData;
+  bool useState = _useAlgState && _hasStateData && useCal; // requires cal
+  if (useCal || useState) {
+    uint8_t cfgBuf[TMF8806_CALIB_DATA_SIZE + TMF8806_STATE_DATA_SIZE];
+    uint8_t cfgLen = 0;
+    if (useCal) {
+      memcpy(cfgBuf, _calibData, TMF8806_CALIB_DATA_SIZE);
+      cfgLen += TMF8806_CALIB_DATA_SIZE;
+    }
+    if (useState) {
+      memcpy(cfgBuf + cfgLen, _stateData, TMF8806_STATE_DATA_SIZE);
+      cfgLen += TMF8806_STATE_DATA_SIZE;
+    }
     uint8_t reg = TMF8806_REG_CONFIG;
-    if (!_i2c_dev->write(_calibData, TMF8806_CALIB_DATA_SIZE, true, &reg, 1)) {
+    if (!_i2c_dev->write(cfgBuf, cfgLen, true, &reg, 1)) {
       return false;
     }
   }
@@ -125,7 +139,7 @@ bool Adafruit_TMF8806::startMeasuring(bool continuous) {
   // bit 2: reserved (0)
   // bits 5:3: spadDeadTime
   // bits 7:6: spadSelect
-  cmdData[2] = ((_useCalibration && _hasCalibData) ? 0x01 : 0x00) |
+  cmdData[2] = (useCal ? 0x01 : 0x00) | (useState ? 0x02 : 0x00) |
                (((uint8_t)_spadDeadTime & 0x07) << 3) |
                (((uint8_t)_spadConfig & 0x03) << 6);
 
@@ -287,6 +301,10 @@ bool Adafruit_TMF8806::readResult(tmf8806_result_t* result) {
 
   // Crosstalk (little-endian 16-bit)
   result->crosstalk = buffer[32] | ((uint16_t)buffer[33] << 8);
+
+  // Auto-capture algorithm state data (offsets 12-22 = registers 0x28-0x32)
+  memcpy(_stateData, &buffer[12], TMF8806_STATE_DATA_SIZE);
+  _hasStateData = true;
 
   return true;
 }
@@ -533,6 +551,51 @@ bool Adafruit_TMF8806::setCalibrationData(const uint8_t* data, uint8_t len) {
  */
 void Adafruit_TMF8806::enableCalibration(bool enable) {
   _useCalibration = enable;
+}
+
+// ============================================================================
+// Algorithm state
+// ============================================================================
+
+/*!
+ * @brief Get the algorithm state data from the last measurement result.
+ *        Save this before sleeping to restore on wakeup for faster convergence.
+ * @param data Buffer to receive state data
+ * @param len Buffer length (must be TMF8806_STATE_DATA_SIZE = 11)
+ * @return true if valid state data available, false if no measurement taken yet
+ */
+bool Adafruit_TMF8806::getAlgorithmState(uint8_t* data, uint8_t len) {
+  if (!_hasStateData || len < TMF8806_STATE_DATA_SIZE) {
+    return false;
+  }
+  memcpy(data, _stateData, TMF8806_STATE_DATA_SIZE);
+  return true;
+}
+
+/*!
+ * @brief Load algorithm state data to restore after sleep/power cycle.
+ *        Must also call enableAlgorithmState(true) and have calibration
+ *        enabled for state to be used.
+ * @param data State data buffer (11 bytes from getAlgorithmState)
+ * @param len Buffer length (must be TMF8806_STATE_DATA_SIZE = 11)
+ * @return true on success, false if len is too small
+ */
+bool Adafruit_TMF8806::setAlgorithmState(const uint8_t* data, uint8_t len) {
+  if (len < TMF8806_STATE_DATA_SIZE) {
+    return false;
+  }
+  memcpy(_stateData, data, TMF8806_STATE_DATA_SIZE);
+  _hasStateData = true;
+  return true;
+}
+
+/*!
+ * @brief Enable or disable use of algorithm state data in measurements.
+ *        Requires calibration to also be enabled (factoryCal=1 + algState=1).
+ * @param enable true to use state data, false to disable
+ */
+void Adafruit_TMF8806::enableAlgorithmState(bool enable) {
+  _useAlgState = enable;
 }
 
 /*!

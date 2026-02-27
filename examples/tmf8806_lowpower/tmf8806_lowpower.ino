@@ -2,9 +2,12 @@
  * @file tmf8806_lowpower.ino
  *
  * Low-power example for TMF8806 Time-of-Flight Distance Sensor.
- * Takes a single-shot distance reading, then sleeps the sensor for
- * 10 seconds before waking and reading again. The TMF8806 draws ~3uA
- * in sleep mode vs ~2mA active.
+ * Takes a single-shot distance reading, saves algorithm state, then
+ * sleeps the sensor for 10 seconds before waking and reading again.
+ * The TMF8806 draws ~3uA in sleep mode vs ~2mA active.
+ *
+ * Algorithm state is saved between sleep cycles so the sensor
+ * converges faster on wakeup (better accuracy on first reading).
  *
  * Limor 'ladyada' Fried with assistance from Claude Code
  * MIT License
@@ -13,6 +16,10 @@
 #include <Adafruit_TMF8806.h>
 
 Adafruit_TMF8806 tof;
+
+uint8_t calData[TMF8806_CALIB_DATA_SIZE];
+uint8_t stateData[TMF8806_STATE_DATA_SIZE];
+bool hasState = false;
 
 void setup() {
   Serial.begin(115200);
@@ -34,6 +41,19 @@ void setup() {
   tof.setRepetitionPeriod_ms(0);
   tof.setDistanceMode(TMF8806_MODE_2_5M);
   tof.setIterations(400);
+
+  // Run factory calibration once at startup
+  Serial.println(F("Running factory calibration..."));
+  if (tof.performFactoryCalibration()) {
+    tof.getCalibrationData(calData);
+    tof.setCalibrationData(calData);
+    tof.enableCalibration(true);
+    Serial.println(F("Calibration done!"));
+  } else {
+    Serial.println(F("Calibration failed, continuing without it"));
+  }
+
+  Serial.println();
 }
 
 void loop() {
@@ -42,6 +62,12 @@ void loop() {
     Serial.println(F("Failed to wake sensor!"));
     delay(10000);
     return;
+  }
+
+  // Restore algorithm state from previous cycle (if available)
+  if (hasState) {
+    tof.setAlgorithmState(stateData);
+    tof.enableAlgorithmState(true);
   }
 
   // Take a single-shot measurement
@@ -74,6 +100,11 @@ void loop() {
     Serial.println(F("/63"));
   } else {
     Serial.println(F("No object detected"));
+  }
+
+  // Save algorithm state for next cycle
+  if (tof.getAlgorithmState(stateData)) {
+    hasState = true;
   }
 
   // Put sensor to sleep (~3uA)

@@ -61,6 +61,7 @@
 
 // Factory calibration data size
 #define TMF8806_CALIB_DATA_SIZE 14 ///< Factory calibration data size
+#define TMF8806_STATE_DATA_SIZE 11 ///< Algorithm state data size
 
 // Expected chip ID (bits [5:0])
 #define TMF8806_CHIP_ID 0x09 ///< Expected chip ID value
@@ -182,6 +183,12 @@ class Adafruit_TMF8806 {
   void getVersion(uint8_t* major, uint8_t* minor, uint8_t* patch);
   bool readSerialNumber(uint8_t* serial, uint8_t len);
 
+  // Algorithm state (for power cycling)
+  bool getAlgorithmState(uint8_t* data, uint8_t len = TMF8806_STATE_DATA_SIZE);
+  bool setAlgorithmState(const uint8_t* data,
+                         uint8_t len = TMF8806_STATE_DATA_SIZE);
+  void enableAlgorithmState(bool enable);
+
   // Low power
   bool sleep();
   bool wakeup();
@@ -203,6 +210,11 @@ class Adafruit_TMF8806 {
   bool _useCalibration;                        ///< Use calibration data
   uint8_t _calibData[TMF8806_CALIB_DATA_SIZE]; ///< Calibration data
   bool _hasCalibData;                          ///< Have valid cal data
+
+  // Algorithm state
+  bool _useAlgState;                           ///< Use algorithm state
+  uint8_t _stateData[TMF8806_STATE_DATA_SIZE]; ///< Algorithm state data
+  bool _hasStateData;                          ///< Have valid state data
 
   // Last result temperature
   int8_t _lastTemperature; ///< Last measured temperature
