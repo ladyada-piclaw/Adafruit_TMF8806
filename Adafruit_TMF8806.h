@@ -157,10 +157,10 @@ class Adafruit_TMF8806 {
   tmf8806_distance_mode_t getDistanceMode();
   void setIterations(uint16_t kIters);
   uint16_t getIterations();
-  void setRepetitionPeriod(uint8_t periodMs);
-  uint8_t getRepetitionPeriod();
-  void setThreshold(uint8_t snrThreshold);
-  uint8_t getThreshold();
+  void setRepetitionPeriod_ms(uint8_t periodMs);
+  uint8_t getRepetitionPeriod_ms();
+  void setSNRThreshold(uint8_t snrThreshold);
+  uint8_t getSNRThreshold();
   void setSpadDeadTime(tmf8806_spad_deadtime_t dt);
   tmf8806_spad_deadtime_t getSpadDeadTime();
   void setOpticalConfig(tmf8806_spad_config_t config);

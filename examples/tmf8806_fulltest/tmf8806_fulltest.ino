@@ -57,6 +57,9 @@ void setup() {
 
   // --- Distance Mode ---
   tof.setDistanceMode(TMF8806_MODE_2_5M);
+  // Other options:
+  // tof.setDistanceMode(TMF8806_MODE_SHORT_RANGE); // max 200mm
+  // tof.setDistanceMode(TMF8806_MODE_5M);          // max 5300mm
   Serial.print(F("Distance mode: "));
   switch (tof.getDistanceMode()) {
     case TMF8806_MODE_SHORT_RANGE:
@@ -70,44 +73,46 @@ void setup() {
       break;
   }
 
-  // Other options:
-  // tof.setDistanceMode(TMF8806_MODE_SHORT_RANGE); // max 200mm
-  // tof.setDistanceMode(TMF8806_MODE_5M);          // max 5300mm
-
   // --- Iterations ---
   tof.setIterations(400); // units of 1000, range 10-4000
+  // Other options:
+  // tof.setIterations(50);   // fastest, lowest accuracy
+  // tof.setIterations(900);  // slower, best accuracy
   Serial.print(F("Iterations: "));
   Serial.print(tof.getIterations());
   Serial.println(F("k"));
 
-  // Higher = more accurate + higher reliability, but slower
-  // 50k  = fastest, lowest accuracy
-  // 400k = default, good balance
-  // 900k = slower, best accuracy
-
   // --- Repetition Period ---
-  tof.setRepetitionPeriod(33); // ms, 0 = single-shot
+  tof.setRepetitionPeriod_ms(33); // ms between measurements
+  // Other options:
+  // tof.setRepetitionPeriod_ms(0);    // single-shot mode
+  // tof.setRepetitionPeriod_ms(10);   // fast (~100 Hz if iterations allow)
+  // tof.setRepetitionPeriod_ms(66);   // ~15 Hz
+  // tof.setRepetitionPeriod_ms(100);  // ~10 Hz
+  // tof.setRepetitionPeriod_ms(254);  // 1 second
+  // tof.setRepetitionPeriod_ms(255);  // 2 seconds
   Serial.print(F("Repetition period: "));
-  Serial.print(tof.getRepetitionPeriod());
+  Serial.print(tof.getRepetitionPeriod_ms());
   Serial.println(F(" ms"));
 
-  // Other options:
-  // tof.setRepetitionPeriod(0);    // single-shot
-  // tof.setRepetitionPeriod(10);   // fast (~100 Hz if iterations allow)
-  // tof.setRepetitionPeriod(66);   // ~15 Hz
-  // tof.setRepetitionPeriod(100);  // ~10 Hz
-  // tof.setRepetitionPeriod(254);  // 1 second
-  // tof.setRepetitionPeriod(255);  // 2 seconds
-
   // --- SNR Threshold ---
-  tof.setThreshold(6); // 0-63, default 6
+  tof.setSNRThreshold(6); // 0-63, higher = fewer false detects
+  // Other options:
+  // tof.setSNRThreshold(0);   // no filtering
+  // tof.setSNRThreshold(12);  // stricter, may miss weak targets
   Serial.print(F("SNR threshold: "));
-  Serial.println(tof.getThreshold());
-
-  // Higher threshold = fewer false detections but may miss weak targets
+  Serial.println(tof.getSNRThreshold());
 
   // --- SPAD Dead Time ---
   tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_97NS);
+  // Other options:
+  // tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_48NS);
+  // tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_32NS);
+  // tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_24NS);
+  // tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_16NS);  // default balance
+  // tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_12NS);
+  // tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_8NS);
+  // tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_4NS);   // best sunlight
   Serial.print(F("SPAD dead time: "));
   switch (tof.getSpadDeadTime()) {
     case TMF8806_SPAD_DEADTIME_97NS:
@@ -136,18 +141,11 @@ void setup() {
       break;
   }
 
-  // Options:
-  // TMF8806_SPAD_DEADTIME_97NS  = best short-range accuracy
-  // TMF8806_SPAD_DEADTIME_48NS
-  // TMF8806_SPAD_DEADTIME_32NS
-  // TMF8806_SPAD_DEADTIME_24NS
-  // TMF8806_SPAD_DEADTIME_16NS  = default balance
-  // TMF8806_SPAD_DEADTIME_12NS
-  // TMF8806_SPAD_DEADTIME_8NS
-  // TMF8806_SPAD_DEADTIME_4NS   = best sunlight performance
-
   // --- Optical Configuration ---
   tof.setOpticalConfig(TMF8806_SPAD_DEFAULT);
+  // Other options:
+  // tof.setOpticalConfig(TMF8806_SPAD_LARGE_AIRGAP);  // 1mm airgap, min 20mm
+  // tof.setOpticalConfig(TMF8806_SPAD_THICK_GLASS);    // 3.2mm glass, min 40mm
   Serial.print(F("Optical config: "));
   switch (tof.getOpticalConfig()) {
     case TMF8806_SPAD_DEFAULT:
@@ -161,35 +159,29 @@ void setup() {
       break;
   }
 
-  // Options:
-  // TMF8806_SPAD_DEFAULT       = 0.5mm airgap, 0.55mm glass, min 0mm
-  // TMF8806_SPAD_LARGE_AIRGAP  = 1mm airgap, min 20mm
-  // TMF8806_SPAD_THICK_GLASS   = 0mm airgap, 3.2mm glass, min 40mm
-
   // --- GPIO Modes ---
   tof.setGPIOMode(0, TMF8806_GPIO_DISABLED);
+  // Other options:
+  // tof.setGPIOMode(0, TMF8806_GPIO_INPUT_ACTIVE_LOW);    // low halts
+  // measurement tof.setGPIOMode(0, TMF8806_GPIO_INPUT_ACTIVE_HIGH);   // high
+  // halts measurement tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_VCSEL_PULSE);  //
+  // VCSEL timing signal tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_LOW); // output
+  // low tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_HIGH);          // output high
+  // tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_DETECT_HIGH);   // high when
+  // detected tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_DETECT_LOW);    // low when
+  // detected tof.setGPIOMode(0, TMF8806_GPIO_OD_NO_DETECT_LOW);     //
+  // open-drain, low on no detect tof.setGPIOMode(0,
+  // TMF8806_GPIO_OD_DETECT_LOW);        // open-drain, low on detect Note: GPIO
+  // modes are applied when startMeasuring() is called.
   Serial.print(F("GPIO0: "));
   Serial.println(tof.getGPIOMode(0) == TMF8806_GPIO_DISABLED ? F("disabled")
-                                                              : F("enabled"));
+                                                             : F("enabled"));
 
   tof.setGPIOMode(1, TMF8806_GPIO_DISABLED);
+  // Same options as GPIO0 above
   Serial.print(F("GPIO1: "));
   Serial.println(tof.getGPIOMode(1) == TMF8806_GPIO_DISABLED ? F("disabled")
-                                                              : F("enabled"));
-
-  // GPIO options:
-  // TMF8806_GPIO_DISABLED            = off
-  // TMF8806_GPIO_INPUT_ACTIVE_LOW    = low halts measurement
-  // TMF8806_GPIO_INPUT_ACTIVE_HIGH   = high halts measurement
-  // TMF8806_GPIO_OUTPUT_VCSEL_PULSE  = VCSEL timing signal
-  // TMF8806_GPIO_OUTPUT_LOW          = output low
-  // TMF8806_GPIO_OUTPUT_HIGH         = output high
-  // TMF8806_GPIO_OUTPUT_DETECT_HIGH  = high when object detected
-  // TMF8806_GPIO_OUTPUT_DETECT_LOW   = low when object detected
-  // TMF8806_GPIO_OD_NO_DETECT_LOW    = open-drain, low on no detect
-  // TMF8806_GPIO_OD_DETECT_LOW       = open-drain, low on detect
-  // Note: GPIO modes are applied when startMeasuring() is called.
-  // GPIO0 is also used for I/O voltage detection at startup.
+                                                             : F("enabled"));
 
   // --- Calibration ---
   // Uncomment to run factory calibration (needs clear FoV >40cm)

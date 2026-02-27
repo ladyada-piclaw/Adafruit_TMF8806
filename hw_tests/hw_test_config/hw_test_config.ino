@@ -9,7 +9,7 @@ Adafruit_TMF8806 tof;
 uint8_t passes = 0;
 uint8_t fails = 0;
 
-void check(const __FlashStringHelper *name, bool cond) {
+void check(const __FlashStringHelper* name, bool cond) {
   Serial.print(name);
   if (cond) {
     Serial.println(F(" ... PASS"));
@@ -23,7 +23,8 @@ void check(const __FlashStringHelper *name, bool cond) {
 bool waitForData(uint16_t timeoutMs) {
   uint32_t start = millis();
   while ((millis() - start) < timeoutMs) {
-    if (tof.dataReady()) return true;
+    if (tof.dataReady())
+      return true;
     delay(1);
   }
   return false;
@@ -32,27 +33,30 @@ bool waitForData(uint16_t timeoutMs) {
 uint16_t measureOnce(uint16_t timeoutMs) {
   if (waitForData(timeoutMs)) {
     tmf8806_result_t r;
-    if (tof.readResult(&r)) return r.distance;
+    if (tof.readResult(&r))
+      return r.distance;
   }
   return 0;
 }
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
   Serial.println(F("=== HW TEST: config ==="));
   Serial.println();
 
   if (!tof.begin()) {
     Serial.println(F("ABORT: sensor not found"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   // --- Test 1: 2.5m mode (default) ---
   Serial.println(F("-- 2.5m mode --"));
   tof.setDistanceMode(TMF8806_MODE_2_5M);
   tof.setIterations(400);
-  tof.setRepetitionPeriod(33);
+  tof.setRepetitionPeriod_ms(33);
   bool ok = tof.startMeasuring(true);
   check(F("start 2.5m"), ok);
   uint16_t dist25 = measureOnce(200);
@@ -66,7 +70,7 @@ void setup() {
   Serial.println(F("-- 5m mode --"));
   tof.setDistanceMode(TMF8806_MODE_5M);
   tof.setIterations(400);
-  tof.setRepetitionPeriod(66);
+  tof.setRepetitionPeriod_ms(66);
   ok = tof.startMeasuring(true);
   check(F("start 5m"), ok);
   uint16_t dist5 = measureOnce(300);
@@ -75,7 +79,8 @@ void setup() {
   check(F("5m reading valid"), dist5 > 0 && dist5 < 5300);
   // Distance should be roughly the same as 2.5m mode
   int16_t diff = (int16_t)dist5 - (int16_t)dist25;
-  if (diff < 0) diff = -diff;
+  if (diff < 0)
+    diff = -diff;
   Serial.print(F("  diff from 2.5m="));
   Serial.println(diff);
   check(F("5m agrees with 2.5m (<100mm)"), diff < 100);
@@ -86,10 +91,11 @@ void setup() {
   Serial.println(F("-- Short range mode --"));
   tof.setDistanceMode(TMF8806_MODE_SHORT_RANGE);
   tof.setIterations(400);
-  tof.setRepetitionPeriod(33);
+  tof.setRepetitionPeriod_ms(33);
   ok = tof.startMeasuring(true);
   check(F("start short range"), ok);
-  // Short range max is 200mm - if target is far, distance should be 0 or clamped
+  // Short range max is 200mm - if target is far, distance should be 0 or
+  // clamped
   uint16_t distShort = measureOnce(200);
   Serial.print(F("  dist="));
   Serial.println(distShort);
@@ -104,7 +110,7 @@ void setup() {
 
   // Low iterations (faster, less accurate)
   tof.setIterations(100);
-  tof.setRepetitionPeriod(10);
+  tof.setRepetitionPeriod_ms(10);
   ok = tof.startMeasuring(true);
   check(F("start 100k iters"), ok);
   uint32_t t0 = millis();
@@ -121,7 +127,7 @@ void setup() {
 
   // High iterations (slower, more accurate)
   tof.setIterations(900);
-  tof.setRepetitionPeriod(100);
+  tof.setRepetitionPeriod_ms(100);
   ok = tof.startMeasuring(true);
   check(F("start 900k iters"), ok);
   t0 = millis();
@@ -141,7 +147,7 @@ void setup() {
   Serial.println(F("-- SPAD dead time --"));
   tof.setDistanceMode(TMF8806_MODE_2_5M);
   tof.setIterations(400);
-  tof.setRepetitionPeriod(33);
+  tof.setRepetitionPeriod_ms(33);
 
   tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_97NS);
   ok = tof.startMeasuring(true);
@@ -187,9 +193,13 @@ void setup() {
 
   Serial.println();
   Serial.println(F("=== RESULTS ==="));
-  Serial.print(passes); Serial.print(F(" passed, "));
-  Serial.print(fails); Serial.println(F(" failed"));
+  Serial.print(passes);
+  Serial.print(F(" passed, "));
+  Serial.print(fails);
+  Serial.println(F(" failed"));
   Serial.println(fails == 0 ? F("ALL PASS") : F("SOME FAILED"));
 }
 
-void loop() { delay(1000); }
+void loop() {
+  delay(1000);
+}

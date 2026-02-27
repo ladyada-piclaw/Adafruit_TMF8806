@@ -21,7 +21,7 @@ Adafruit_TMF8806 tof;
 uint8_t passes = 0;
 uint8_t fails = 0;
 
-void check(const __FlashStringHelper *name, bool cond) {
+void check(const __FlashStringHelper* name, bool cond) {
   Serial.print(name);
   if (cond) {
     Serial.println(F(" ... PASS"));
@@ -35,7 +35,8 @@ void check(const __FlashStringHelper *name, bool cond) {
 bool waitForData(uint16_t timeoutMs) {
   uint32_t start = millis();
   while ((millis() - start) < timeoutMs) {
-    if (tof.dataReady()) return true;
+    if (tof.dataReady())
+      return true;
     delay(1);
   }
   return false;
@@ -43,7 +44,8 @@ bool waitForData(uint16_t timeoutMs) {
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
   Serial.println(F("=== HW TEST: pins ==="));
   Serial.println();
 
@@ -58,7 +60,8 @@ void setup() {
 
   if (!tof.begin()) {
     Serial.println(F("ABORT: sensor not found"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   // ==========================================================
@@ -211,9 +214,13 @@ void setup() {
 
   Serial.println();
   Serial.println(F("=== RESULTS ==="));
-  Serial.print(passes); Serial.print(F(" passed, "));
-  Serial.print(fails); Serial.println(F(" failed"));
+  Serial.print(passes);
+  Serial.print(F(" passed, "));
+  Serial.print(fails);
+  Serial.println(F(" failed"));
   Serial.println(fails == 0 ? F("ALL PASS") : F("SOME FAILED"));
 }
 
-void loop() { delay(1000); }
+void loop() {
+  delay(1000);
+}

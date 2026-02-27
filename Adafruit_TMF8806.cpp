@@ -331,7 +331,7 @@ uint16_t Adafruit_TMF8806::getIterations() {
  * @brief Set measurement repetition period
  * @param periodMs Period in milliseconds (5-253, 0=single-shot)
  */
-void Adafruit_TMF8806::setRepetitionPeriod(uint8_t periodMs) {
+void Adafruit_TMF8806::setRepetitionPeriod_ms(uint8_t periodMs) {
   _repetitionPeriod = periodMs;
 }
 
@@ -339,7 +339,7 @@ void Adafruit_TMF8806::setRepetitionPeriod(uint8_t periodMs) {
  * @brief Get current repetition period
  * @return Period in milliseconds (0=single-shot)
  */
-uint8_t Adafruit_TMF8806::getRepetitionPeriod() {
+uint8_t Adafruit_TMF8806::getRepetitionPeriod_ms() {
   return _repetitionPeriod;
 }
 
@@ -347,7 +347,7 @@ uint8_t Adafruit_TMF8806::getRepetitionPeriod() {
  * @brief Set SNR detection threshold
  * @param snrThreshold Threshold value (0=default which is 6)
  */
-void Adafruit_TMF8806::setThreshold(uint8_t snrThreshold) {
+void Adafruit_TMF8806::setSNRThreshold(uint8_t snrThreshold) {
   _snrThreshold = snrThreshold & 0x3F;
 }
 
@@ -355,7 +355,7 @@ void Adafruit_TMF8806::setThreshold(uint8_t snrThreshold) {
  * @brief Get current SNR threshold
  * @return Threshold value (0-63)
  */
-uint8_t Adafruit_TMF8806::getThreshold() {
+uint8_t Adafruit_TMF8806::getSNRThreshold() {
   return _snrThreshold;
 }
 

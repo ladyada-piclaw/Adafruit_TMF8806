@@ -59,9 +59,9 @@ void setup() {
   }
 
   // Configure sensor (optional - defaults work well)
-  tof.setDistanceMode(TMF8806_MODE_2_5M);  // 2.5m mode (default)
-  tof.setIterations(400);                   // 400k iterations
-  tof.setRepetitionPeriod(33);              // ~30Hz
+  tof.setDistanceMode(TMF8806_MODE_2_5M); // 2.5m mode (default)
+  tof.setIterations(400);                 // 400k iterations
+  tof.setRepetitionPeriod_ms(33);         // ~30Hz
 
   // Start continuous measurement
   if (!tof.startMeasuring(true)) {

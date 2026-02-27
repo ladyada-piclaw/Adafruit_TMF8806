@@ -9,7 +9,7 @@ Adafruit_TMF8806 tof;
 uint8_t passes = 0;
 uint8_t fails = 0;
 
-void check(const __FlashStringHelper *name, bool cond) {
+void check(const __FlashStringHelper* name, bool cond) {
   Serial.print(name);
   if (cond) {
     Serial.println(F(" ... PASS"));
@@ -22,7 +22,8 @@ void check(const __FlashStringHelper *name, bool cond) {
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  while (!Serial)
+    delay(10);
   Serial.println(F("=== HW TEST: begin ==="));
   Serial.println();
 
@@ -31,7 +32,8 @@ void setup() {
   check(F("begin()"), ok);
   if (!ok) {
     Serial.println(F("ABORT: sensor not found"));
-    while (1) delay(10);
+    while (1)
+      delay(10);
   }
 
   // Test chip ID
@@ -44,8 +46,10 @@ void setup() {
   uint8_t major, minor, patch;
   tof.getVersion(&major, &minor, &patch);
   Serial.print(F("  FW: "));
-  Serial.print(major); Serial.print(F("."));
-  Serial.print(minor); Serial.print(F("."));
+  Serial.print(major);
+  Serial.print(F("."));
+  Serial.print(minor);
+  Serial.print(F("."));
   Serial.println(patch);
   check(F("FW major > 0"), major > 0);
 
@@ -54,7 +58,8 @@ void setup() {
   ok = tof.readSerialNumber(serial, 4);
   Serial.print(F("  Serial: 0x"));
   for (int i = 3; i >= 0; i--) {
-    if (serial[i] < 0x10) Serial.print(F("0"));
+    if (serial[i] < 0x10)
+      Serial.print(F("0"));
     Serial.print(serial[i], HEX);
   }
   Serial.println();
@@ -74,9 +79,13 @@ void setup() {
 
   Serial.println();
   Serial.println(F("=== RESULTS ==="));
-  Serial.print(passes); Serial.print(F(" passed, "));
-  Serial.print(fails); Serial.println(F(" failed"));
+  Serial.print(passes);
+  Serial.print(F(" passed, "));
+  Serial.print(fails);
+  Serial.println(F(" failed"));
   Serial.println(fails == 0 ? F("ALL PASS") : F("SOME FAILED"));
 }
 
-void loop() { delay(1000); }
+void loop() {
+  delay(1000);
+}
