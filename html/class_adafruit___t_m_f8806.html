@@ -510,7 +510,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Set GPIO mode (applied on next <a class="el" href="class_adafruit___t_m_f8806.html#a8d6aab9436d83a1e7a48ff1f8139713f" title="Start distance measurement. ">startMeasuring()</a> call) </p>
 <p>GPIO configuration is part of the measurement command and takes effect when <a class="el" href="class_adafruit___t_m_f8806.html#a8d6aab9436d83a1e7a48ff1f8139713f" title="Start distance measurement. ">startMeasuring()</a> is called. There is no standalone GPIO command.</p>
-<dl class="section note"><dt>Note</dt><dd>GPIO0 is used for I/O voltage auto-detection at startup (EN rising edge). An internal pull-up may prevent OUTPUT_LOW from working on GPIO0. Use GPIO1 for reliable output control.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>GPIO0 is used for I/O voltage auto-detection at startup (EN rising edge). Ensure any external pull-up on GPIO0 does not conflict with the desired output mode.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">gpio</td><td>GPIO number (0 or 1) </td></tr>
