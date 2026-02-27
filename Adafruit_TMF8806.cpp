@@ -106,8 +106,8 @@ bool Adafruit_TMF8806::startMeasuring(bool continuous) {
 
   // If using calibration, write cal data to 0x20 first
   if (_useCalibration && _hasCalibData) {
-    if (!writeRegBuffer(TMF8806_REG_CONFIG, _calibData,
-                        TMF8806_CALIB_DATA_SIZE)) {
+    uint8_t reg = TMF8806_REG_CONFIG;
+    if (!_i2c_dev->write(_calibData, TMF8806_CALIB_DATA_SIZE, true, &reg, 1)) {
       return false;
     }
   }
@@ -167,7 +167,8 @@ bool Adafruit_TMF8806::startMeasuring(bool continuous) {
   cmdData[10] = TMF8806_CMD_MEASURE;
 
   // Write all 11 bytes starting at 0x06
-  if (!writeRegBuffer(TMF8806_REG_CMD_DATA9, cmdData, 11)) {
+  uint8_t reg = TMF8806_REG_CMD_DATA9;
+  if (!_i2c_dev->write(cmdData, 11, true, &reg, 1)) {
     return false;
   }
 
@@ -228,7 +229,8 @@ int16_t Adafruit_TMF8806::readDistance() {
 bool Adafruit_TMF8806::readResult(tmf8806_result_t* result) {
   uint8_t buffer[34]; // Read from 0x1C to 0x3D (34 bytes)
 
-  if (!readRegBuffer(TMF8806_REG_STATE, buffer, 34)) {
+  uint8_t regState = TMF8806_REG_STATE;
+  if (!_i2c_dev->write_then_read(&regState, 1, buffer, 34)) {
     return false;
   }
 
@@ -376,7 +378,8 @@ bool Adafruit_TMF8806::performFactoryCalibration() {
   cmdData[10] = TMF8806_CMD_FACTORY_CALIB;
 
   // Write command
-  if (!writeRegBuffer(TMF8806_REG_CMD_DATA9, cmdData, 11)) {
+  uint8_t reg = TMF8806_REG_CMD_DATA9;
+  if (!_i2c_dev->write(cmdData, 11, true, &reg, 1)) {
     return false;
   }
 
@@ -415,8 +418,9 @@ bool Adafruit_TMF8806::getCalibrationData(uint8_t* data, uint8_t len) {
   }
 
   // Read CONTENT register + calibration data
+  uint8_t regContent = TMF8806_REG_CONTENT;
   uint8_t buffer[2 + TMF8806_CALIB_DATA_SIZE];
-  if (!readRegBuffer(TMF8806_REG_CONTENT, buffer, sizeof(buffer))) {
+  if (!_i2c_dev->write_then_read(&regContent, 1, buffer, sizeof(buffer))) {
     return false;
   }
 
@@ -537,8 +541,9 @@ bool Adafruit_TMF8806::readSerialNumber(uint8_t* serial, uint8_t len) {
   // Read content register + serial number
   // Serial number is at registers 0x28-0x2B (4 bytes)
   // We need to read from 0x1E (CONTENT) to at least 0x2B
+  uint8_t regContent = TMF8806_REG_CONTENT;
   uint8_t buffer[14]; // 0x1E to 0x2B = 14 bytes
-  if (!readRegBuffer(TMF8806_REG_CONTENT, buffer, 14)) {
+  if (!_i2c_dev->write_then_read(&regContent, 1, buffer, 14)) {
     return false;
   }
 
@@ -667,9 +672,10 @@ bool Adafruit_TMF8806::executeCommand(uint8_t cmd, uint16_t timeoutMs) {
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_STATE);
   uint32_t startMs = millis();
   while ((millis() - startMs) < timeoutMs) {
+    uint8_t regCmd = TMF8806_REG_COMMAND;
     uint8_t buffer[2];
     // Read COMMAND (0x10) and PREVIOUS (0x11)
-    if (!readRegBuffer(TMF8806_REG_COMMAND, buffer, 2)) {
+    if (!_i2c_dev->write_then_read(&regCmd, 1, buffer, 2)) {
       return false;
     }
 
@@ -687,36 +693,6 @@ bool Adafruit_TMF8806::executeCommand(uint8_t cmd, uint16_t timeoutMs) {
     delayMicroseconds(100);
   }
   return false;
-}
-
-/*!
- * @brief Read multiple registers
- * @param reg Starting register address
- * @param buffer Buffer to store data
- * @param len Number of bytes to read
- * @return true on success, false on failure
- */
-bool Adafruit_TMF8806::readRegBuffer(uint8_t reg, uint8_t* buffer,
-                                     uint8_t len) {
-  return _i2c_dev->write_then_read(&reg, 1, buffer, len);
-}
-
-/*!
- * @brief Write multiple registers
- * @param reg Starting register address
- * @param buffer Data to write
- * @param len Number of bytes to write
- * @return true on success, false on failure
- */
-bool Adafruit_TMF8806::writeRegBuffer(uint8_t reg, uint8_t* buffer,
-                                      uint8_t len) {
-  uint8_t temp[64];
-  if (len > 63) {
-    return false;
-  }
-  temp[0] = reg;
-  memcpy(&temp[1], buffer, len);
-  return _i2c_dev->write(temp, len + 1);
 }
 
 /*!

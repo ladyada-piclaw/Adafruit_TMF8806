@@ -193,8 +193,6 @@ class Adafruit_TMF8806 {
   bool waitForCpuReady(uint16_t timeoutMs);
   bool waitForApp(uint16_t timeoutMs);
   bool executeCommand(uint8_t cmd, uint16_t timeoutMs);
-  bool readRegBuffer(uint8_t reg, uint8_t* buffer, uint8_t len);
-  bool writeRegBuffer(uint8_t reg, uint8_t* buffer, uint8_t len);
   uint16_t getMaxDistance();
 };
 
