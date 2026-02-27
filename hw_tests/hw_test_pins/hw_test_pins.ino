@@ -153,14 +153,11 @@ void setup() {
   Serial.println();
   Serial.println(F("-- GPIO0 output --"));
 
+  // GPIO config is applied via startMeasuring()
   // Set GPIO0 to output LOW
   tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_LOW);
   tof.startMeasuring(true);
-  delay(100);
-  if (waitForData(200)) {
-    tof.readResult(&result);
-  }
-  delay(10);
+  delay(50);
   int g0low = digitalRead(PIN_GPIO0);
   Serial.print(F("  GPIO0 set LOW, read="));
   Serial.println(g0low);
@@ -171,11 +168,7 @@ void setup() {
   // Set GPIO0 to output HIGH
   tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_HIGH);
   tof.startMeasuring(true);
-  delay(100);
-  if (waitForData(200)) {
-    tof.readResult(&result);
-  }
-  delay(10);
+  delay(50);
   int g0high = digitalRead(PIN_GPIO0);
   Serial.print(F("  GPIO0 set HIGH, read="));
   Serial.println(g0high);
@@ -193,11 +186,7 @@ void setup() {
   tof.setGPIOMode(0, TMF8806_GPIO_DISABLED);
   tof.setGPIOMode(1, TMF8806_GPIO_OUTPUT_LOW);
   tof.startMeasuring(true);
-  delay(100);
-  if (waitForData(200)) {
-    tof.readResult(&result);
-  }
-  delay(10);
+  delay(50);
   int g1low = digitalRead(PIN_GPIO1);
   Serial.print(F("  GPIO1 set LOW, read="));
   Serial.println(g1low);
@@ -208,11 +197,7 @@ void setup() {
   // Set GPIO1 to output HIGH
   tof.setGPIOMode(1, TMF8806_GPIO_OUTPUT_HIGH);
   tof.startMeasuring(true);
-  delay(100);
-  if (waitForData(200)) {
-    tof.readResult(&result);
-  }
-  delay(10);
+  delay(50);
   int g1high = digitalRead(PIN_GPIO1);
   Serial.print(F("  GPIO1 set HIGH, read="));
   Serial.println(g1high);
