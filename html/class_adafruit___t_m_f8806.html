@@ -171,6 +171,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:addf0ed504ea1bb0817fd5757eaa50947"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#addf0ed504ea1bb0817fd5757eaa50947">readSerialNumber</a> (uint8_t *serial, uint8_t len)</td></tr>
 <tr class="memdesc:addf0ed504ea1bb0817fd5757eaa50947"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read device serial number.  <a href="#addf0ed504ea1bb0817fd5757eaa50947">More...</a><br /></td></tr>
 <tr class="separator:addf0ed504ea1bb0817fd5757eaa50947"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb9d2291075da6c2c7e9b860c9221de6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#aeb9d2291075da6c2c7e9b860c9221de6">sleep</a> ()</td></tr>
+<tr class="memdesc:aeb9d2291075da6c2c7e9b860c9221de6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Put the sensor into low-power sleep by clearing the PON bit. The sensor draws ~3uA in this state. Call <a class="el" href="class_adafruit___t_m_f8806.html#a6f345fc9a6f2387991782faa71253766" title="Wake the sensor from sleep and restart the measurement application. Equivalent to the wake sequence i...">wakeup()</a> to resume.  <a href="#aeb9d2291075da6c2c7e9b860c9221de6">More...</a><br /></td></tr>
+<tr class="separator:aeb9d2291075da6c2c7e9b860c9221de6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f345fc9a6f2387991782faa71253766"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#a6f345fc9a6f2387991782faa71253766">wakeup</a> ()</td></tr>
+<tr class="memdesc:a6f345fc9a6f2387991782faa71253766"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wake the sensor from sleep and restart the measurement application. Equivalent to the wake sequence in <a class="el" href="class_adafruit___t_m_f8806.html#a73a42c2f2f7adeda5b2b0f792c7639b7" title="Initialize the TMF8806 sensor. ">begin()</a>.  <a href="#a6f345fc9a6f2387991782faa71253766">More...</a><br /></td></tr>
+<tr class="separator:a6f345fc9a6f2387991782faa71253766"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Adafruit TMF8806 Time-of-Flight sensor driver class. </p>
@@ -949,6 +955,46 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, false on failure </dd></dl>
+
+</div>
+</div>
+<a id="aeb9d2291075da6c2c7e9b860c9221de6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb9d2291075da6c2c7e9b860c9221de6">&#9670;&nbsp;</a></span>sleep()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_TMF8806::sleep </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Put the sensor into low-power sleep by clearing the PON bit. The sensor draws ~3uA in this state. Call <a class="el" href="class_adafruit___t_m_f8806.html#a6f345fc9a6f2387991782faa71253766" title="Wake the sensor from sleep and restart the measurement application. Equivalent to the wake sequence i...">wakeup()</a> to resume. </p>
+<dl class="section return"><dt>Returns</dt><dd>true on success, false on I2C error </dd></dl>
+
+</div>
+</div>
+<a id="a6f345fc9a6f2387991782faa71253766"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f345fc9a6f2387991782faa71253766">&#9670;&nbsp;</a></span>wakeup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_TMF8806::wakeup </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Wake the sensor from sleep and restart the measurement application. Equivalent to the wake sequence in <a class="el" href="class_adafruit___t_m_f8806.html#a73a42c2f2f7adeda5b2b0f792c7639b7" title="Initialize the TMF8806 sensor. ">begin()</a>. </p>
 <dl class="section return"><dt>Returns</dt><dd>true on success, false on failure </dd></dl>
 
 </div>
