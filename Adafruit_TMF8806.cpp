@@ -300,6 +300,14 @@ void Adafruit_TMF8806::setDistanceMode(tmf8806_distance_mode_t mode) {
 }
 
 /*!
+ * @brief Get current distance mode
+ * @return Distance mode
+ */
+tmf8806_distance_mode_t Adafruit_TMF8806::getDistanceMode() {
+  return _distanceMode;
+}
+
+/*!
  * @brief Set number of integration iterations
  * @param kIters Number of iterations in units of 1000 (10-4000)
  */
@@ -312,11 +320,27 @@ void Adafruit_TMF8806::setIterations(uint16_t kIters) {
 }
 
 /*!
+ * @brief Get current iterations setting
+ * @return Iterations in units of 1000
+ */
+uint16_t Adafruit_TMF8806::getIterations() {
+  return _kIters;
+}
+
+/*!
  * @brief Set measurement repetition period
  * @param periodMs Period in milliseconds (5-253, 0=single-shot)
  */
 void Adafruit_TMF8806::setRepetitionPeriod(uint8_t periodMs) {
   _repetitionPeriod = periodMs;
+}
+
+/*!
+ * @brief Get current repetition period
+ * @return Period in milliseconds (0=single-shot)
+ */
+uint8_t Adafruit_TMF8806::getRepetitionPeriod() {
+  return _repetitionPeriod;
 }
 
 /*!
@@ -328,6 +352,14 @@ void Adafruit_TMF8806::setThreshold(uint8_t snrThreshold) {
 }
 
 /*!
+ * @brief Get current SNR threshold
+ * @return Threshold value (0-63)
+ */
+uint8_t Adafruit_TMF8806::getThreshold() {
+  return _snrThreshold;
+}
+
+/*!
  * @brief Set SPAD dead time
  * @param dt Dead time setting
  */
@@ -336,11 +368,27 @@ void Adafruit_TMF8806::setSpadDeadTime(tmf8806_spad_deadtime_t dt) {
 }
 
 /*!
+ * @brief Get current SPAD dead time setting
+ * @return Dead time setting
+ */
+tmf8806_spad_deadtime_t Adafruit_TMF8806::getSpadDeadTime() {
+  return _spadDeadTime;
+}
+
+/*!
  * @brief Set optical stack configuration
  * @param config SPAD optical configuration
  */
 void Adafruit_TMF8806::setOpticalConfig(tmf8806_spad_config_t config) {
   _spadConfig = config;
+}
+
+/*!
+ * @brief Get current optical configuration
+ * @return SPAD optical configuration
+ */
+tmf8806_spad_config_t Adafruit_TMF8806::getOpticalConfig() {
+  return _spadConfig;
 }
 
 /*!
@@ -362,6 +410,18 @@ void Adafruit_TMF8806::setGPIOMode(uint8_t gpio, tmf8806_gpio_mode_t mode) {
   } else if (gpio == 1) {
     _gpio1Mode = (uint8_t)mode;
   }
+}
+
+/*!
+ * @brief Get current GPIO mode
+ * @param gpio GPIO number (0 or 1)
+ * @return GPIO mode
+ */
+tmf8806_gpio_mode_t Adafruit_TMF8806::getGPIOMode(uint8_t gpio) {
+  if (gpio == 0) {
+    return (tmf8806_gpio_mode_t)_gpio0Mode;
+  }
+  return (tmf8806_gpio_mode_t)_gpio1Mode;
 }
 
 /*!

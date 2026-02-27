@@ -58,7 +58,17 @@ void setup() {
   // --- Distance Mode ---
   tof.setDistanceMode(TMF8806_MODE_2_5M);
   Serial.print(F("Distance mode: "));
-  Serial.println(F("2.5m"));
+  switch (tof.getDistanceMode()) {
+    case TMF8806_MODE_SHORT_RANGE:
+      Serial.println(F("Short Range (max 200mm)"));
+      break;
+    case TMF8806_MODE_2_5M:
+      Serial.println(F("2.5m (max 2650mm)"));
+      break;
+    case TMF8806_MODE_5M:
+      Serial.println(F("5m (max 5300mm)"));
+      break;
+  }
 
   // Other options:
   // tof.setDistanceMode(TMF8806_MODE_SHORT_RANGE); // max 200mm
@@ -67,7 +77,8 @@ void setup() {
   // --- Iterations ---
   tof.setIterations(400); // units of 1000, range 10-4000
   Serial.print(F("Iterations: "));
-  Serial.println(F("400k"));
+  Serial.print(tof.getIterations());
+  Serial.println(F("k"));
 
   // Higher = more accurate + higher reliability, but slower
   // 50k  = fastest, lowest accuracy
@@ -77,7 +88,8 @@ void setup() {
   // --- Repetition Period ---
   tof.setRepetitionPeriod(33); // ms, 0 = single-shot
   Serial.print(F("Repetition period: "));
-  Serial.println(F("33 ms (~30 Hz)"));
+  Serial.print(tof.getRepetitionPeriod());
+  Serial.println(F(" ms"));
 
   // Other options:
   // tof.setRepetitionPeriod(0);    // single-shot
@@ -90,14 +102,39 @@ void setup() {
   // --- SNR Threshold ---
   tof.setThreshold(6); // 0-63, default 6
   Serial.print(F("SNR threshold: "));
-  Serial.println(F("6 (default)"));
+  Serial.println(tof.getThreshold());
 
   // Higher threshold = fewer false detections but may miss weak targets
 
   // --- SPAD Dead Time ---
   tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_97NS);
   Serial.print(F("SPAD dead time: "));
-  Serial.println(F("97ns (best short-range accuracy)"));
+  switch (tof.getSpadDeadTime()) {
+    case TMF8806_SPAD_DEADTIME_97NS:
+      Serial.println(F("97ns (best short-range)"));
+      break;
+    case TMF8806_SPAD_DEADTIME_48NS:
+      Serial.println(F("48ns"));
+      break;
+    case TMF8806_SPAD_DEADTIME_32NS:
+      Serial.println(F("32ns"));
+      break;
+    case TMF8806_SPAD_DEADTIME_24NS:
+      Serial.println(F("24ns"));
+      break;
+    case TMF8806_SPAD_DEADTIME_16NS:
+      Serial.println(F("16ns (default balance)"));
+      break;
+    case TMF8806_SPAD_DEADTIME_12NS:
+      Serial.println(F("12ns"));
+      break;
+    case TMF8806_SPAD_DEADTIME_8NS:
+      Serial.println(F("8ns"));
+      break;
+    case TMF8806_SPAD_DEADTIME_4NS:
+      Serial.println(F("4ns (best sunlight)"));
+      break;
+  }
 
   // Options:
   // TMF8806_SPAD_DEADTIME_97NS  = best short-range accuracy
@@ -112,7 +149,17 @@ void setup() {
   // --- Optical Configuration ---
   tof.setOpticalConfig(TMF8806_SPAD_DEFAULT);
   Serial.print(F("Optical config: "));
-  Serial.println(F("Default (0.5mm airgap, 0.55mm glass)"));
+  switch (tof.getOpticalConfig()) {
+    case TMF8806_SPAD_DEFAULT:
+      Serial.println(F("Default (0.5mm airgap, 0.55mm glass)"));
+      break;
+    case TMF8806_SPAD_LARGE_AIRGAP:
+      Serial.println(F("Large Airgap (1mm, min 20mm)"));
+      break;
+    case TMF8806_SPAD_THICK_GLASS:
+      Serial.println(F("Thick Glass (3.2mm, min 40mm)"));
+      break;
+  }
 
   // Options:
   // TMF8806_SPAD_DEFAULT       = 0.5mm airgap, 0.55mm glass, min 0mm
@@ -122,11 +169,13 @@ void setup() {
   // --- GPIO Modes ---
   tof.setGPIOMode(0, TMF8806_GPIO_DISABLED);
   Serial.print(F("GPIO0: "));
-  Serial.println(F("disabled"));
+  Serial.println(tof.getGPIOMode(0) == TMF8806_GPIO_DISABLED ? F("disabled")
+                                                              : F("enabled"));
 
   tof.setGPIOMode(1, TMF8806_GPIO_DISABLED);
   Serial.print(F("GPIO1: "));
-  Serial.println(F("disabled"));
+  Serial.println(tof.getGPIOMode(1) == TMF8806_GPIO_DISABLED ? F("disabled")
+                                                              : F("enabled"));
 
   // GPIO options:
   // TMF8806_GPIO_DISABLED            = off
