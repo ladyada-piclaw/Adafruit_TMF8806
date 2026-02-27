@@ -67,7 +67,9 @@ bool Adafruit_TMF8806::begin(uint8_t addr, TwoWire* wire) {
   // Step 1: Set PON bit to wake up device
   Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_ENABLE);
-  if (!enable_reg.write(0x01)) {
+  Adafruit_BusIO_RegisterBits pon_bit =
+      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 0);
+  if (!pon_bit.write(1)) {
     return false;
   }
 
@@ -94,12 +96,16 @@ bool Adafruit_TMF8806::begin(uint8_t addr, TwoWire* wire) {
   // Step 5: Enable result interrupt (bit 0)
   Adafruit_BusIO_Register int_status_reg =
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
-  if (!int_status_reg.write(0x01)) { // Clear first
+  Adafruit_BusIO_RegisterBits int1_status =
+      Adafruit_BusIO_RegisterBits(&int_status_reg, 1, 0);
+  if (!int1_status.write(1)) { // Clear by writing 1
     return false;
   }
   Adafruit_BusIO_Register int_enab_reg =
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_ENAB);
-  if (!int_enab_reg.write(0x01)) { // Enable
+  Adafruit_BusIO_RegisterBits int1_enab =
+      Adafruit_BusIO_RegisterBits(&int_enab_reg, 1, 0);
+  if (!int1_enab.write(1)) { // Enable result interrupt
     return false;
   }
 
@@ -121,7 +127,9 @@ bool Adafruit_TMF8806::reset() {
   // writing to RESETREASON at 0xF0)
   Adafruit_BusIO_Register resetreason_reg =
       Adafruit_BusIO_Register(_i2c_dev, 0xF0);
-  if (!resetreason_reg.write(0x80)) {
+  Adafruit_BusIO_RegisterBits reset_bit =
+      Adafruit_BusIO_RegisterBits(&resetreason_reg, 1, 7);
+  if (!reset_bit.write(1)) {
     return false;
   }
 
@@ -130,7 +138,9 @@ bool Adafruit_TMF8806::reset() {
   // Re-initialize
   Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_ENABLE);
-  if (!enable_reg.write(0x01)) {
+  Adafruit_BusIO_RegisterBits pon_bit =
+      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 0);
+  if (!pon_bit.write(1)) {
     return false;
   }
 
@@ -153,10 +163,14 @@ bool Adafruit_TMF8806::reset() {
   // Re-enable interrupts
   Adafruit_BusIO_Register int_status_reg =
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
-  int_status_reg.write(0x01);
+  Adafruit_BusIO_RegisterBits int1_status =
+      Adafruit_BusIO_RegisterBits(&int_status_reg, 1, 0);
+  int1_status.write(1); // Clear by writing 1
   Adafruit_BusIO_Register int_enab_reg =
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_ENAB);
-  int_enab_reg.write(0x01);
+  Adafruit_BusIO_RegisterBits int1_enab =
+      Adafruit_BusIO_RegisterBits(&int_enab_reg, 1, 0);
+  int1_enab.write(1); // Enable result interrupt
 
   return true;
 }
@@ -263,8 +277,9 @@ bool Adafruit_TMF8806::stopMeasuring() {
 bool Adafruit_TMF8806::dataReady() {
   Adafruit_BusIO_Register int_status_reg =
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
-  uint8_t intStatus = int_status_reg.read();
-  return (intStatus & 0x01) != 0;
+  Adafruit_BusIO_RegisterBits int1_status =
+      Adafruit_BusIO_RegisterBits(&int_status_reg, 1, 0);
+  return int1_status.read();
 }
 
 /*!
@@ -304,7 +319,9 @@ bool Adafruit_TMF8806::readResult(tmf8806_result_t* result) {
   // Clear interrupt
   Adafruit_BusIO_Register int_status_reg =
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
-  int_status_reg.write(0x01);
+  Adafruit_BusIO_RegisterBits int1_status =
+      Adafruit_BusIO_RegisterBits(&int_status_reg, 1, 0);
+  int1_status.write(1);
 
   // Parse result from offset 4 (register 0x20)
   // Result structure starts at 0x20, but our buffer starts at 0x1C
@@ -493,7 +510,9 @@ bool Adafruit_TMF8806::getCalibrationData(uint8_t* data, uint8_t len) {
   // Clear interrupt
   Adafruit_BusIO_Register int_status_reg =
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
-  int_status_reg.write(0x01);
+  Adafruit_BusIO_RegisterBits int1_status =
+      Adafruit_BusIO_RegisterBits(&int_status_reg, 1, 0);
+  int1_status.write(1);
 
   return true;
 }
@@ -626,11 +645,13 @@ bool Adafruit_TMF8806::readSerialNumber(uint8_t* serial, uint8_t len) {
 bool Adafruit_TMF8806::waitForCpuReady(uint16_t timeoutMs) {
   Adafruit_BusIO_Register enable_reg =
       Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_ENABLE);
+  Adafruit_BusIO_RegisterBits pon_bit =
+      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 0);
+  Adafruit_BusIO_RegisterBits cpu_ready_bit =
+      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 6);
   uint32_t startMs = millis();
   while ((millis() - startMs) < timeoutMs) {
-    uint8_t enable = enable_reg.read();
-    // CPU_READY (bit 6) + PON (bit 0) = 0x41
-    if ((enable & 0x41) == 0x41) {
+    if (pon_bit.read() && cpu_ready_bit.read()) {
       return true;
     }
     delay(1);
