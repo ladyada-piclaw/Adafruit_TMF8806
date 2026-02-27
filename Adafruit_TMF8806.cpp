@@ -350,8 +350,8 @@ void Adafruit_TMF8806::setOpticalConfig(tmf8806_spad_config_t config) {
  * when startMeasuring() is called. There is no standalone GPIO command.
  *
  * @note GPIO0 is used for I/O voltage auto-detection at startup (EN rising
- * edge). An internal pull-up may prevent OUTPUT_LOW from working on GPIO0.
- * Use GPIO1 for reliable output control.
+ * edge). Ensure any external pull-up on GPIO0 does not conflict with the
+ * desired output mode.
  *
  * @param gpio GPIO number (0 or 1)
  * @param mode GPIO mode

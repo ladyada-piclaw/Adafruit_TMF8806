@@ -105,8 +105,8 @@ typedef enum {
  *
  * @note GPIO0 is sampled at startup (EN rising edge) to select the I/O
  * voltage level (>=1.5V selects 1.8-3.3V mode, <1.5V selects 1.2V mode).
- * An internal pull-up on GPIO0 may prevent OUTPUT_LOW from driving the pin
- * fully low after boot. GPIO1 does not have this limitation.
+ * Ensure any external pull-up on GPIO0 for voltage selection does not
+ * conflict with the desired GPIO output mode.
  */
 typedef enum {
   TMF8806_GPIO_DISABLED = 0,           ///< GPIO disabled
