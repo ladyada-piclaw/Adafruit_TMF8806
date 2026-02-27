@@ -189,6 +189,7 @@ class Adafruit_TMF8806 {
   int8_t _lastTemperature; ///< Last measured temperature
 
   // Internal methods
+  bool startApp();
   bool waitForCpuReady(uint16_t timeoutMs);
   bool waitForApp(uint16_t timeoutMs);
   bool executeCommand(uint8_t cmd, uint16_t timeoutMs);
