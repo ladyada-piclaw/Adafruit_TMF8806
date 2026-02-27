@@ -5,8 +5,8 @@
  * Wiring:
  *   TMF8806 INT  -> Metro D2
  *   TMF8806 EN   -> Metro D3
+ *   TMF8806 GPIO0 -> Metro D5
  *   TMF8806 GPIO1 -> Metro D6
- *   (GPIO0 not tested — used for I/O voltage detection at startup)
  *   Servo on D4 (not used in this test)
  */
 
@@ -14,6 +14,7 @@
 
 #define PIN_INT 2
 #define PIN_EN 3
+#define PIN_GPIO0 5
 #define PIN_GPIO1 6
 
 Adafruit_TMF8806 tof;
@@ -48,6 +49,7 @@ void setup() {
 
   pinMode(PIN_INT, INPUT_PULLUP);
   pinMode(PIN_EN, OUTPUT);
+  pinMode(PIN_GPIO0, INPUT);
   pinMode(PIN_GPIO1, INPUT);
 
   // Start with EN HIGH
@@ -144,12 +146,51 @@ void setup() {
   delay(50);
 
   // ==========================================================
+  // TEST: GPIO0 output modes
+  // NOTE: GPIO0 is used for I/O voltage detection at startup,
+  // which may interfere with output LOW behavior.
+  // ==========================================================
+  Serial.println();
+  Serial.println(F("-- GPIO0 output --"));
+
+  // Set GPIO0 to output LOW
+  tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_LOW);
+  tof.startMeasuring(true);
+  delay(100);
+  if (waitForData(200)) {
+    tof.readResult(&result);
+  }
+  delay(10);
+  int g0low = digitalRead(PIN_GPIO0);
+  Serial.print(F("  GPIO0 set LOW, read="));
+  Serial.println(g0low);
+  check(F("GPIO0 output LOW"), g0low == LOW);
+  tof.stopMeasuring();
+  delay(50);
+
+  // Set GPIO0 to output HIGH
+  tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_HIGH);
+  tof.startMeasuring(true);
+  delay(100);
+  if (waitForData(200)) {
+    tof.readResult(&result);
+  }
+  delay(10);
+  int g0high = digitalRead(PIN_GPIO0);
+  Serial.print(F("  GPIO0 set HIGH, read="));
+  Serial.println(g0high);
+  check(F("GPIO0 output HIGH"), g0high == HIGH);
+  tof.stopMeasuring();
+  delay(50);
+
+  // ==========================================================
   // TEST: GPIO1 output modes
   // ==========================================================
   Serial.println();
   Serial.println(F("-- GPIO1 output --"));
 
-  // Set GPIO1 to output LOW
+  // Set GPIO1 to output LOW, GPIO0 back to disabled
+  tof.setGPIOMode(0, TMF8806_GPIO_DISABLED);
   tof.setGPIOMode(1, TMF8806_GPIO_OUTPUT_LOW);
   tof.startMeasuring(true);
   delay(100);
@@ -179,7 +220,8 @@ void setup() {
   tof.stopMeasuring();
   delay(50);
 
-  // Reset GPIO1 to disabled
+  // Reset GPIOs to disabled
+  tof.setGPIOMode(0, TMF8806_GPIO_DISABLED);
   tof.setGPIOMode(1, TMF8806_GPIO_DISABLED);
 
   Serial.println();
