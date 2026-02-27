@@ -182,6 +182,10 @@ class Adafruit_TMF8806 {
   void getVersion(uint8_t* major, uint8_t* minor, uint8_t* patch);
   bool readSerialNumber(uint8_t* serial, uint8_t len);
 
+  // Low power
+  bool sleep();
+  bool wakeup();
+
  private:
   Adafruit_I2CDevice* _i2c_dev; ///< I2C device object
 

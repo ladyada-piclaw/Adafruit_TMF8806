@@ -628,6 +628,32 @@ bool Adafruit_TMF8806::readSerialNumber(uint8_t* serial, uint8_t len) {
 }
 
 // ============================================================================
+// Low power
+// ============================================================================
+
+/*!
+ * @brief Put the sensor into low-power sleep by clearing the PON bit.
+ *        The sensor draws ~3uA in this state. Call wakeup() to resume.
+ * @return true on success, false on I2C error
+ */
+bool Adafruit_TMF8806::sleep() {
+  Adafruit_BusIO_Register enable_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_ENABLE);
+  Adafruit_BusIO_RegisterBits pon_bit =
+      Adafruit_BusIO_RegisterBits(&enable_reg, 1, 0);
+  return pon_bit.write(0);
+}
+
+/*!
+ * @brief Wake the sensor from sleep and restart the measurement application.
+ *        Equivalent to the wake sequence in begin().
+ * @return true on success, false on failure
+ */
+bool Adafruit_TMF8806::wakeup() {
+  return startApp();
+}
+
+// ============================================================================
 // Private helper methods
 // ============================================================================
 
