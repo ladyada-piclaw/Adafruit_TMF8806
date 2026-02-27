@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['getalgorithmstate',['getAlgorithmState',['../class_adafruit___t_m_f8806.html#aec8dec8b62b3dfb0eb8d3a6325442db3',1,'Adafruit_TMF8806']]],
   ['getcalibrationdata',['getCalibrationData',['../class_adafruit___t_m_f8806.html#aed5178793ba66b360b91062709882a06',1,'Adafruit_TMF8806']]],
   ['getchipid',['getChipID',['../class_adafruit___t_m_f8806.html#ae1d7e2a8b17bd5024bf3d9db770d38d8',1,'Adafruit_TMF8806']]],
   ['getdistancemode',['getDistanceMode',['../class_adafruit___t_m_f8806.html#aea5275982a2c4052bc2d4f10299ddee8',1,'Adafruit_TMF8806']]],

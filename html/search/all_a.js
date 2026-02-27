@@ -60,5 +60,6 @@ var searchData=
   ['tmf8806_5fspad_5fdeadtime_5ft',['tmf8806_spad_deadtime_t',['../_adafruit___t_m_f8806_8h.html#a097dcdab40e360edfbc4c797186a751c',1,'Adafruit_TMF8806.h']]],
   ['tmf8806_5fspad_5fdefault',['TMF8806_SPAD_DEFAULT',['../_adafruit___t_m_f8806_8h.html#a980ecb629829da0c0ec0e7a9469b61dcabb8948afdf10a9e071176641774754b0',1,'Adafruit_TMF8806.h']]],
   ['tmf8806_5fspad_5flarge_5fairgap',['TMF8806_SPAD_LARGE_AIRGAP',['../_adafruit___t_m_f8806_8h.html#a980ecb629829da0c0ec0e7a9469b61dca27ab8a82437bbfda65c5991e3a8a999e',1,'Adafruit_TMF8806.h']]],
-  ['tmf8806_5fspad_5fthick_5fglass',['TMF8806_SPAD_THICK_GLASS',['../_adafruit___t_m_f8806_8h.html#a980ecb629829da0c0ec0e7a9469b61dcaa7576b13fbc22ca7a911f9bdaae5e9fe',1,'Adafruit_TMF8806.h']]]
+  ['tmf8806_5fspad_5fthick_5fglass',['TMF8806_SPAD_THICK_GLASS',['../_adafruit___t_m_f8806_8h.html#a980ecb629829da0c0ec0e7a9469b61dcaa7576b13fbc22ca7a911f9bdaae5e9fe',1,'Adafruit_TMF8806.h']]],
+  ['tmf8806_5fstate_5fdata_5fsize',['TMF8806_STATE_DATA_SIZE',['../_adafruit___t_m_f8806_8h.html#a52e73256f7638093a9eeb8270371505e',1,'Adafruit_TMF8806.h']]]
 ];
