@@ -77,16 +77,13 @@ void setup() {
 void loop() {
   if (tof.dataReady()) {
     tmf8806_result_t result;
-    if (tof.readResult(&result)) {
+    if (tof.readResult(&result) && result.reliability > 0) {
       Serial.print(F("Distance: "));
       Serial.print(result.distance);
       Serial.print(F(" mm"));
 
       Serial.print(F("  Reliability: "));
       Serial.print(result.reliability);
-
-      Serial.print(F("  Status: "));
-      Serial.print(result.status);
 
       Serial.print(F("  Temp: "));
       Serial.print(result.temperature);
