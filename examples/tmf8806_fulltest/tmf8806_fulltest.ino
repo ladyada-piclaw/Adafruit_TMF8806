@@ -1,90 +1,38 @@
 /*!
  * @file tmf8806_fulltest.ino
  *
- * Full feature demo for the Adafruit TMF8806 Time-of-Flight sensor.
- * Cycles through all available configurations so you can see how each
- * setting affects distance readings, reliability, and measurement speed.
+ * Full test sketch for TMF8806 Time-of-Flight Distance Sensor.
+ * Sets and reads back all available configurations.
  *
- * Written by Limor Fried/Ladyada for Adafruit Industries.
- * BSD license, all text here must be included in any redistribution.
+ * Limor 'ladyada' Fried with assistance from Claude Code
+ * MIT License
  */
 
 #include <Adafruit_TMF8806.h>
 
 Adafruit_TMF8806 tof;
 
-// Helper: take N readings and print stats
-void measureAndReport(uint8_t numReadings, uint16_t timeoutMs) {
-  uint16_t minDist = 65535, maxDist = 0;
-  uint32_t sumDist = 0;
-  uint8_t minRel = 63, maxRel = 0;
-  uint8_t count = 0;
-  uint32_t t0 = millis();
-
-  for (uint8_t i = 0; i < numReadings; i++) {
-    uint32_t start = millis();
-    while ((millis() - start) < timeoutMs) {
-      if (tof.dataReady()) {
-        tmf8806_result_t r;
-        if (tof.readResult(&r) && r.reliability > 0) {
-          if (r.distance < minDist) minDist = r.distance;
-          if (r.distance > maxDist) maxDist = r.distance;
-          if (r.reliability < minRel) minRel = r.reliability;
-          if (r.reliability > maxRel) maxRel = r.reliability;
-          sumDist += r.distance;
-          count++;
-        }
-        break;
-      }
-      delay(1);
-    }
-  }
-
-  uint32_t elapsed = millis() - t0;
-
-  if (count > 0) {
-    Serial.print(F("  Avg dist: "));
-    Serial.print(sumDist / count);
-    Serial.print(F(" mm  ("));
-    Serial.print(minDist);
-    Serial.print(F("-"));
-    Serial.print(maxDist);
-    Serial.println(F(" mm)"));
-    Serial.print(F("  Reliability: "));
-    Serial.print(minRel);
-    Serial.print(F("-"));
-    Serial.println(maxRel);
-  } else {
-    Serial.println(F("  No valid readings (no object detected?)"));
-  }
-  Serial.print(F("  "));
-  Serial.print(count);
-  Serial.print(F("/"));
-  Serial.print(numReadings);
-  Serial.print(F(" readings in "));
-  Serial.print(elapsed);
-  Serial.println(F(" ms"));
-}
-
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
 
-  Serial.println(F("========================================"));
-  Serial.println(F(" TMF8806 Full Feature Demo"));
-  Serial.println(F("========================================"));
-  Serial.println();
+  while (!Serial)
+    delay(10);
+
+  Serial.println(F("TMF8806 Time-of-Flight Sensor Full Test"));
 
   if (!tof.begin()) {
-    Serial.println(F("Failed to find TMF8806 sensor!"));
-    while (1) delay(10);
+    Serial.println(F("Failed to find TMF8806 chip"));
+    while (1)
+      delay(10);
   }
 
-  // --- Device info ---
-  Serial.println(F("--- Device Info ---"));
+  Serial.println(F("TMF8806 found!"));
+
+  // --- Device Info ---
   Serial.print(F("Chip ID: 0x"));
   Serial.println(tof.getChipID(), HEX);
-  Serial.print(F("Revision: "));
+
+  Serial.print(F("Revision ID: "));
   Serial.println(tof.getRevisionID());
 
   uint8_t major, minor, patch;
@@ -100,251 +48,159 @@ void setup() {
   if (tof.readSerialNumber(serial, 4)) {
     Serial.print(F("Serial: 0x"));
     for (int i = 3; i >= 0; i--) {
-      if (serial[i] < 0x10) Serial.print(F("0"));
+      if (serial[i] < 0x10)
+        Serial.print(F("0"));
       Serial.print(serial[i], HEX);
     }
     Serial.println();
   }
-  Serial.println();
 
-  // =============================================
-  // Distance Modes
-  // =============================================
-  Serial.println(F("=== Distance Modes ==="));
-  Serial.println(F("(10 readings each, default 400k iterations)"));
-  Serial.println();
+  // --- Distance Mode ---
+  tof.setDistanceMode(TMF8806_MODE_2_5M);
+  Serial.print(F("Distance mode: "));
+  Serial.println(F("2.5m"));
 
-  // Short range
-  Serial.println(F(">> Short Range (max 200mm)"));
-  tof.setDistanceMode(TMF8806_MODE_SHORT_RANGE);
-  tof.setIterations(400);
-  tof.setRepetitionPeriod(33);
+  // Other options:
+  // tof.setDistanceMode(TMF8806_MODE_SHORT_RANGE); // max 200mm
+  // tof.setDistanceMode(TMF8806_MODE_5M);          // max 5300mm
+
+  // --- Iterations ---
+  tof.setIterations(400); // units of 1000, range 10-4000
+  Serial.print(F("Iterations: "));
+  Serial.println(F("400k"));
+
+  // Higher = more accurate + higher reliability, but slower
+  // 50k  = fastest, lowest accuracy
+  // 400k = default, good balance
+  // 900k = slower, best accuracy
+
+  // --- Repetition Period ---
+  tof.setRepetitionPeriod(33); // ms, 0 = single-shot
+  Serial.print(F("Repetition period: "));
+  Serial.println(F("33 ms (~30 Hz)"));
+
+  // Other options:
+  // tof.setRepetitionPeriod(0);    // single-shot
+  // tof.setRepetitionPeriod(10);   // fast (~100 Hz if iterations allow)
+  // tof.setRepetitionPeriod(66);   // ~15 Hz
+  // tof.setRepetitionPeriod(100);  // ~10 Hz
+  // tof.setRepetitionPeriod(254);  // 1 second
+  // tof.setRepetitionPeriod(255);  // 2 seconds
+
+  // --- SNR Threshold ---
+  tof.setThreshold(6); // 0-63, default 6
+  Serial.print(F("SNR threshold: "));
+  Serial.println(F("6 (default)"));
+
+  // Higher threshold = fewer false detections but may miss weak targets
+
+  // --- SPAD Dead Time ---
   tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_97NS);
+  Serial.print(F("SPAD dead time: "));
+  Serial.println(F("97ns (best short-range accuracy)"));
+
+  // Options:
+  // TMF8806_SPAD_DEADTIME_97NS  = best short-range accuracy
+  // TMF8806_SPAD_DEADTIME_48NS
+  // TMF8806_SPAD_DEADTIME_32NS
+  // TMF8806_SPAD_DEADTIME_24NS
+  // TMF8806_SPAD_DEADTIME_16NS  = default balance
+  // TMF8806_SPAD_DEADTIME_12NS
+  // TMF8806_SPAD_DEADTIME_8NS
+  // TMF8806_SPAD_DEADTIME_4NS   = best sunlight performance
+
+  // --- Optical Configuration ---
   tof.setOpticalConfig(TMF8806_SPAD_DEFAULT);
-  tof.startMeasuring(true);
-  measureAndReport(10, 200);
-  tof.stopMeasuring();
-  delay(50);
+  Serial.print(F("Optical config: "));
+  Serial.println(F("Default (0.5mm airgap, 0.55mm glass)"));
 
-  // 2.5m mode
-  Serial.println(F(">> 2.5m Mode (max 2650mm)"));
-  tof.setDistanceMode(TMF8806_MODE_2_5M);
-  tof.startMeasuring(true);
-  measureAndReport(10, 200);
-  tof.stopMeasuring();
-  delay(50);
+  // Options:
+  // TMF8806_SPAD_DEFAULT       = 0.5mm airgap, 0.55mm glass, min 0mm
+  // TMF8806_SPAD_LARGE_AIRGAP  = 1mm airgap, min 20mm
+  // TMF8806_SPAD_THICK_GLASS   = 0mm airgap, 3.2mm glass, min 40mm
 
-  // 5m mode
-  Serial.println(F(">> 5m Mode (max 5300mm)"));
-  tof.setDistanceMode(TMF8806_MODE_5M);
-  tof.setRepetitionPeriod(66);
-  tof.startMeasuring(true);
-  measureAndReport(10, 300);
-  tof.stopMeasuring();
-  delay(50);
+  // --- GPIO Modes ---
+  tof.setGPIOMode(0, TMF8806_GPIO_DISABLED);
+  Serial.print(F("GPIO0: "));
+  Serial.println(F("disabled"));
 
-  Serial.println();
+  tof.setGPIOMode(1, TMF8806_GPIO_DISABLED);
+  Serial.print(F("GPIO1: "));
+  Serial.println(F("disabled"));
 
-  // =============================================
-  // Iterations (affects accuracy vs speed)
-  // =============================================
-  Serial.println(F("=== Iterations (accuracy vs speed) ==="));
-  Serial.println(F("(10 readings each, 2.5m mode)"));
-  Serial.println();
+  // GPIO options:
+  // TMF8806_GPIO_DISABLED            = off
+  // TMF8806_GPIO_INPUT_ACTIVE_LOW    = low halts measurement
+  // TMF8806_GPIO_INPUT_ACTIVE_HIGH   = high halts measurement
+  // TMF8806_GPIO_OUTPUT_VCSEL_PULSE  = VCSEL timing signal
+  // TMF8806_GPIO_OUTPUT_LOW          = output low
+  // TMF8806_GPIO_OUTPUT_HIGH         = output high
+  // TMF8806_GPIO_OUTPUT_DETECT_HIGH  = high when object detected
+  // TMF8806_GPIO_OUTPUT_DETECT_LOW   = low when object detected
+  // TMF8806_GPIO_OD_NO_DETECT_LOW    = open-drain, low on no detect
+  // TMF8806_GPIO_OD_DETECT_LOW       = open-drain, low on detect
+  // Note: GPIO modes are applied when startMeasuring() is called.
+  // GPIO0 is also used for I/O voltage detection at startup.
 
-  tof.setDistanceMode(TMF8806_MODE_2_5M);
-  tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_97NS);
-
-  uint16_t iters[] = {50, 100, 200, 400, 900};
-  for (uint8_t i = 0; i < 5; i++) {
-    Serial.print(F(">> "));
-    Serial.print(iters[i]);
-    Serial.println(F("k iterations"));
-    tof.setIterations(iters[i]);
-    tof.setRepetitionPeriod(10); // fast repetition to show speed diff
-    tof.startMeasuring(true);
-    measureAndReport(10, 500);
-    tof.stopMeasuring();
-    delay(50);
-  }
-
-  Serial.println();
-
-  // =============================================
-  // SPAD Dead Time (short-range accuracy vs sunlight)
-  // =============================================
-  Serial.println(F("=== SPAD Dead Time ==="));
-  Serial.println(F("(10 readings each, 2.5m mode, 400k iters)"));
-  Serial.println();
-
-  tof.setDistanceMode(TMF8806_MODE_2_5M);
-  tof.setIterations(400);
-  tof.setRepetitionPeriod(33);
-
-  for (uint8_t i = 0; i < 8; i++) {
-    Serial.print(F(">> SPAD dead time "));
-    Serial.print(i);
-    Serial.print(F(": "));
-    switch (i) {
-      case 0: Serial.println(F("97ns (best short-range)")); break;
-      case 1: Serial.println(F("48ns")); break;
-      case 2: Serial.println(F("32ns")); break;
-      case 3: Serial.println(F("24ns")); break;
-      case 4: Serial.println(F("16ns (default balance)")); break;
-      case 5: Serial.println(F("12ns")); break;
-      case 6: Serial.println(F("8ns")); break;
-      case 7: Serial.println(F("4ns (best sunlight)")); break;
-    }
-    tof.setSpadDeadTime((tmf8806_spad_deadtime_t)i);
-    tof.startMeasuring(true);
-    measureAndReport(10, 200);
-    tof.stopMeasuring();
-    delay(50);
-  }
-
-  Serial.println();
-
-  // =============================================
-  // Optical Configurations
-  // =============================================
-  Serial.println(F("=== Optical Configurations ==="));
-  Serial.println(F("(10 readings each, 2.5m mode)"));
-  Serial.println();
-
-  tof.setDistanceMode(TMF8806_MODE_2_5M);
-  tof.setIterations(400);
-  tof.setRepetitionPeriod(33);
-  tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_97NS);
-
-  Serial.println(F(">> Default (0.5mm airgap, 0.55mm glass)"));
-  tof.setOpticalConfig(TMF8806_SPAD_DEFAULT);
-  tof.startMeasuring(true);
-  measureAndReport(10, 200);
-  tof.stopMeasuring();
-  delay(50);
-
-  Serial.println(F(">> Large Airgap (1mm, min 20mm)"));
-  tof.setOpticalConfig(TMF8806_SPAD_LARGE_AIRGAP);
-  tof.startMeasuring(true);
-  measureAndReport(10, 200);
-  tof.stopMeasuring();
-  delay(50);
-
-  Serial.println(F(">> Thick Glass (3.2mm, min 40mm)"));
-  tof.setOpticalConfig(TMF8806_SPAD_THICK_GLASS);
-  tof.startMeasuring(true);
-  measureAndReport(10, 200);
-  tof.stopMeasuring();
-  delay(50);
-
-  Serial.println();
-
-  // =============================================
-  // Repetition Period
-  // =============================================
-  Serial.println(F("=== Repetition Period ==="));
-  Serial.println(F("(10 readings each, 2.5m mode, 400k iters)"));
-  Serial.println();
-
-  tof.setDistanceMode(TMF8806_MODE_2_5M);
-  tof.setIterations(400);
-  tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_97NS);
-  tof.setOpticalConfig(TMF8806_SPAD_DEFAULT);
-
-  uint8_t periods[] = {10, 33, 66, 100, 250};
-  for (uint8_t i = 0; i < 5; i++) {
-    Serial.print(F(">> "));
-    Serial.print(periods[i]);
-    Serial.println(F(" ms period"));
-    tof.setRepetitionPeriod(periods[i]);
-    tof.startMeasuring(true);
-    measureAndReport(10, 500);
-    tof.stopMeasuring();
-    delay(50);
-  }
-
-  Serial.println();
-
-  // =============================================
-  // Single-shot mode
-  // =============================================
-  Serial.println(F("=== Single-Shot Mode ==="));
-  Serial.println();
-
-  tof.setDistanceMode(TMF8806_MODE_2_5M);
-  tof.setIterations(400);
-  tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_97NS);
-
-  Serial.println(F(">> Taking 3 single-shot readings..."));
-  for (uint8_t i = 0; i < 3; i++) {
-    tof.startMeasuring(false); // single-shot
-    uint32_t t0 = millis();
-    while (!tof.dataReady() && (millis() - t0) < 500) delay(1);
-    tmf8806_result_t r;
-    if (tof.readResult(&r) && r.reliability > 0) {
-      Serial.print(F("  Shot "));
-      Serial.print(i + 1);
-      Serial.print(F(": "));
-      Serial.print(r.distance);
-      Serial.print(F(" mm, rel="));
-      Serial.print(r.reliability);
-      Serial.print(F(", "));
-      Serial.print(millis() - t0);
-      Serial.println(F(" ms"));
-    } else {
-      Serial.print(F("  Shot "));
-      Serial.print(i + 1);
-      Serial.println(F(": no object"));
-    }
-    delay(50);
-  }
-
-  Serial.println();
-
-  // =============================================
-  // Factory Calibration
-  // =============================================
-  Serial.println(F("=== Factory Calibration ==="));
-  Serial.println(F("(Ensure clear FoV >40cm, low ambient light)"));
-  Serial.println();
-
-  Serial.println(F(">> Running calibration..."));
+  // --- Calibration ---
+  // Uncomment to run factory calibration (needs clear FoV >40cm)
+  /*
+  Serial.println(F("Running factory calibration..."));
   if (tof.performFactoryCalibration()) {
     uint8_t calData[14];
-    if (tof.getCalibrationData(calData, 14)) {
-      Serial.print(F("  Cal data: "));
-      for (uint8_t i = 0; i < 14; i++) {
-        if (calData[i] < 0x10) Serial.print(F("0"));
-        Serial.print(calData[i], HEX);
-        Serial.print(F(" "));
-      }
-      Serial.println();
+    tof.getCalibrationData(calData, 14);
+    Serial.print(F("Cal data: "));
+    for (uint8_t i = 0; i < 14; i++) {
+      if (calData[i] < 0x10) Serial.print(F("0"));
+      Serial.print(calData[i], HEX);
+      Serial.print(F(" "));
     }
+    Serial.println();
 
-    // Compare calibrated vs uncalibrated
-    Serial.println(F(">> Uncalibrated:"));
-    tof.enableCalibration(false);
-    tof.setDistanceMode(TMF8806_MODE_2_5M);
-    tof.setIterations(400);
-    tof.setRepetitionPeriod(33);
-    tof.startMeasuring(true);
-    measureAndReport(10, 200);
-    tof.stopMeasuring();
-    delay(50);
-
-    Serial.println(F(">> Calibrated:"));
-    tof.enableCalibration(true);
-    tof.startMeasuring(true);
-    measureAndReport(10, 200);
-    tof.stopMeasuring();
-  } else {
-    Serial.println(F("  Calibration failed!"));
+    // To use saved calibration data:
+    // tof.setCalibrationData(calData, 14);
+    // tof.enableCalibration(true);
   }
+  */
 
   Serial.println();
-  Serial.println(F("========================================"));
-  Serial.println(F(" Full test complete!"));
-  Serial.println(F("========================================"));
+
+  // --- Start measuring ---
+  if (!tof.startMeasuring(true)) {
+    Serial.println(F("Failed to start measurement!"));
+    while (1)
+      delay(10);
+  }
+
+  Serial.println(F("Measuring..."));
+  Serial.println();
 }
 
-void loop() { delay(1000); }
+void loop() {
+  if (tof.dataReady()) {
+    tmf8806_result_t result;
+    if (tof.readResult(&result) && result.reliability > 0) {
+      Serial.print(F("Distance: "));
+      Serial.print(result.distance);
+      Serial.print(F(" mm"));
+
+      Serial.print(F("  Reliability: "));
+      Serial.print(result.reliability);
+      Serial.print(F("/63"));
+
+      Serial.print(F("  Temp: "));
+      Serial.print(result.temperature);
+      Serial.print(F(" C"));
+
+      Serial.print(F("  Ref hits: "));
+      Serial.print(result.referenceHits);
+
+      Serial.print(F("  Obj hits: "));
+      Serial.print(result.objectHits);
+
+      Serial.print(F("  Xtalk: "));
+      Serial.println(result.crosstalk);
+    }
+  }
+  delay(10);
+}
