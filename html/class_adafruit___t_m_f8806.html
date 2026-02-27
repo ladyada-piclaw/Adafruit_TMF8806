@@ -121,7 +121,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a19db21bf432b3c28b89ec79e3902a2ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set optical stack configuration.  <a href="#a19db21bf432b3c28b89ec79e3902a2ae">More...</a><br /></td></tr>
 <tr class="separator:a19db21bf432b3c28b89ec79e3902a2ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9e3800aa35e77d0452d036fa064815a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#ad9e3800aa35e77d0452d036fa064815a">setGPIOMode</a> (uint8_t gpio, <a class="el" href="_adafruit___t_m_f8806_8h.html#aebbffa51447fb9a54702993022328d37">tmf8806_gpio_mode_t</a> mode)</td></tr>
-<tr class="memdesc:ad9e3800aa35e77d0452d036fa064815a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set GPIO mode.  <a href="#ad9e3800aa35e77d0452d036fa064815a">More...</a><br /></td></tr>
+<tr class="memdesc:ad9e3800aa35e77d0452d036fa064815a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set GPIO mode (applied on next <a class="el" href="class_adafruit___t_m_f8806.html#a8d6aab9436d83a1e7a48ff1f8139713f" title="Start distance measurement. ">startMeasuring()</a> call)  <a href="#ad9e3800aa35e77d0452d036fa064815a">More...</a><br /></td></tr>
 <tr class="separator:ad9e3800aa35e77d0452d036fa064815a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4550922d470de96c131b082f6a77b21"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#aa4550922d470de96c131b082f6a77b21">performFactoryCalibration</a> ()</td></tr>
 <tr class="memdesc:aa4550922d470de96c131b082f6a77b21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform factory calibration.  <a href="#aa4550922d470de96c131b082f6a77b21">More...</a><br /></td></tr>
@@ -508,7 +508,9 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Set GPIO mode. </p>
+<p>Set GPIO mode (applied on next <a class="el" href="class_adafruit___t_m_f8806.html#a8d6aab9436d83a1e7a48ff1f8139713f" title="Start distance measurement. ">startMeasuring()</a> call) </p>
+<p>GPIO configuration is part of the measurement command and takes effect when <a class="el" href="class_adafruit___t_m_f8806.html#a8d6aab9436d83a1e7a48ff1f8139713f" title="Start distance measurement. ">startMeasuring()</a> is called. There is no standalone GPIO command.</p>
+<dl class="section note"><dt>Note</dt><dd>GPIO0 is used for I/O voltage auto-detection at startup (EN rising edge). An internal pull-up may prevent OUTPUT_LOW from working on GPIO0. Use GPIO1 for reliable output control.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">gpio</td><td>GPIO number (0 or 1) </td></tr>
