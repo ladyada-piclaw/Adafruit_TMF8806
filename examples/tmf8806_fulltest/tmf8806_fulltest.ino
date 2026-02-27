@@ -113,10 +113,11 @@ void setup() {
   // tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_12NS);
   // tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_8NS);
   // tof.setSpadDeadTime(TMF8806_SPAD_DEADTIME_4NS);   // best sunlight
+  // 97ns = best short-range accuracy, 4ns = best sunlight performance
   Serial.print(F("SPAD dead time: "));
   switch (tof.getSpadDeadTime()) {
     case TMF8806_SPAD_DEADTIME_97NS:
-      Serial.println(F("97ns (best short-range)"));
+      Serial.println(F("97ns"));
       break;
     case TMF8806_SPAD_DEADTIME_48NS:
       Serial.println(F("48ns"));
@@ -128,7 +129,7 @@ void setup() {
       Serial.println(F("24ns"));
       break;
     case TMF8806_SPAD_DEADTIME_16NS:
-      Serial.println(F("16ns (default balance)"));
+      Serial.println(F("16ns"));
       break;
     case TMF8806_SPAD_DEADTIME_12NS:
       Serial.println(F("12ns"));
@@ -137,7 +138,7 @@ void setup() {
       Serial.println(F("8ns"));
       break;
     case TMF8806_SPAD_DEADTIME_4NS:
-      Serial.println(F("4ns (best sunlight)"));
+      Serial.println(F("4ns"));
       break;
   }
 
@@ -160,19 +161,20 @@ void setup() {
   }
 
   // --- GPIO Modes ---
+  // clang-format off
   tof.setGPIOMode(0, TMF8806_GPIO_DISABLED);
   // Other options:
-  // tof.setGPIOMode(0, TMF8806_GPIO_INPUT_ACTIVE_LOW);    // low halts
-  // measurement tof.setGPIOMode(0, TMF8806_GPIO_INPUT_ACTIVE_HIGH);   // high
-  // halts measurement tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_VCSEL_PULSE);  //
-  // VCSEL timing signal tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_LOW); // output
-  // low tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_HIGH);          // output high
-  // tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_DETECT_HIGH);   // high when
-  // detected tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_DETECT_LOW);    // low when
-  // detected tof.setGPIOMode(0, TMF8806_GPIO_OD_NO_DETECT_LOW);     //
-  // open-drain, low on no detect tof.setGPIOMode(0,
-  // TMF8806_GPIO_OD_DETECT_LOW);        // open-drain, low on detect Note: GPIO
-  // modes are applied when startMeasuring() is called.
+  // tof.setGPIOMode(0, TMF8806_GPIO_INPUT_ACTIVE_LOW);   // low halts measure
+  // tof.setGPIOMode(0, TMF8806_GPIO_INPUT_ACTIVE_HIGH);  // high halts measure
+  // tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_VCSEL_PULSE); // VCSEL timing
+  // tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_LOW);         // drive low
+  // tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_HIGH);        // drive high
+  // tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_DETECT_HIGH); // high on detect
+  // tof.setGPIOMode(0, TMF8806_GPIO_OUTPUT_DETECT_LOW);  // low on detect
+  // tof.setGPIOMode(0, TMF8806_GPIO_OD_NO_DETECT_LOW);   // OD low no detect
+  // tof.setGPIOMode(0, TMF8806_GPIO_OD_DETECT_LOW);      // OD low on detect
+  // Note: GPIO modes are applied when startMeasuring() is called.
+  // clang-format on
   Serial.print(F("GPIO0: "));
   Serial.println(tof.getGPIOMode(0) == TMF8806_GPIO_DISABLED ? F("disabled")
                                                              : F("enabled"));
