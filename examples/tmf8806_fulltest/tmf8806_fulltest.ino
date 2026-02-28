@@ -60,6 +60,7 @@ void setup() {
   // Other options:
   // tof.setDistanceMode(TMF8806_MODE_SHORT_RANGE); // max 200mm
   // tof.setDistanceMode(TMF8806_MODE_5M);          // max 5300mm
+  // tof.setDistanceMode(TMF8806_MODE_10M);         // max 10600mm (requires firmware patch)
   Serial.print(F("Distance mode: "));
   switch (tof.getDistanceMode()) {
     case TMF8806_MODE_SHORT_RANGE:
@@ -70,6 +71,9 @@ void setup() {
       break;
     case TMF8806_MODE_5M:
       Serial.println(F("5m (max 5300mm)"));
+      break;
+    case TMF8806_MODE_10M:
+      Serial.println(F("10m (max 10600mm)"));
       break;
   }
 

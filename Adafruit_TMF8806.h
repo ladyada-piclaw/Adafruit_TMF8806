@@ -67,10 +67,25 @@
 #define TMF8806_CONTENT_SERIAL 0x47 ///< Serial number
 #define TMF8806_CONTENT_RESULT 0x55 ///< Measurement result
 
+// Bootloader registers and commands
+#define TMF8806_REG_BL_CMD_STAT 0x08 ///< Bootloader command/status register
+
+#define TMF8806_BL_CMD_OK 0x00             ///< Bootloader success
+#define TMF8806_BL_CMD_RAMREMAP 0x11       ///< RAM remap command
+#define TMF8806_BL_CMD_DOWNLOAD_INIT 0x14  ///< Download init command
+#define TMF8806_BL_CMD_W_RAM 0x41          ///< Write to RAM command
+#define TMF8806_BL_CMD_ADDR_RAM 0x43       ///< Set RAM address command
+#define TMF8806_BL_DOWNLOAD_INIT_SEED 0x29 ///< Download init seed value
+
+#define TMF8806_BL_HEADER 2    ///< Bootloader packet header size
+#define TMF8806_BL_MAX_DATA 24 ///< Bootloader max data payload (safe for I2C)
+#define TMF8806_BL_FOOTER 1    ///< Bootloader packet footer size (checksum)
+
 // Max distances per mode (mm)
 #define TMF8806_MAX_SHORT_RANGE 200 ///< Short range max distance
 #define TMF8806_MAX_2_5M 2650       ///< 2.5m mode max distance
 #define TMF8806_MAX_5M 5300         ///< 5m mode max distance
+#define TMF8806_MAX_10M 10600       ///< 10m mode max distance
 
 // Factory calibration data size
 #define TMF8806_CALIB_DATA_SIZE 14 ///< Factory calibration data size
@@ -86,6 +101,7 @@ typedef enum {
   TMF8806_MODE_SHORT_RANGE = 0, ///< Short range (200mm max)
   TMF8806_MODE_2_5M = 1,        ///< 2.5m mode (default)
   TMF8806_MODE_5M = 2,          ///< 5m mode
+  TMF8806_MODE_10M = 3,         ///< 10m mode (requires firmware patch)
 } tmf8806_distance_mode_t;
 
 /*!
@@ -177,6 +193,10 @@ class Adafruit_TMF8806 {
   int16_t readDistance();
   bool readResult(tmf8806_result_t* result);
 
+  // Firmware download (for 10m mode)
+  bool downloadFirmware();
+  bool hasFirmwarePatch();
+
   // Configuration
   void setDistanceMode(tmf8806_distance_mode_t mode);
   tmf8806_distance_mode_t getDistanceMode();
@@ -251,6 +271,17 @@ class Adafruit_TMF8806 {
 
   // Histogram state
   tmf8806_histogram_type_t _histType; ///< Selected histogram type
+
+  // Firmware patch state
+  bool _hasFirmwarePatch; ///< True if firmware patch loaded
+
+  // Bootloader methods
+  bool bootloaderDownloadInit();
+  bool bootloaderSetRamAddr(uint16_t addr);
+  bool bootloaderWriteRam(const uint8_t* data, uint8_t len);
+  bool bootloaderRamRemap();
+  uint8_t bootloaderChecksum(const uint8_t* data, uint8_t len);
+  bool waitForBootloaderCmd(uint16_t timeoutMs);
 
   // Internal methods
   bool startApp();

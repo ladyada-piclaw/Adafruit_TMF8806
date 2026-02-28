@@ -20,6 +20,10 @@
 
 #include "Adafruit_TMF8806.h"
 
+#include <avr/pgmspace.h>
+
+#include "Adafruit_TMF8806_image.h"
+
 /*!
  * @brief Constructor for Adafruit_TMF8806
  */
@@ -38,6 +42,7 @@ Adafruit_TMF8806::Adafruit_TMF8806() {
   _useAlgState = false;
   _hasStateData = false;
   _lastTemperature = 0;
+  _hasFirmwarePatch = false;
   memset(_calibData, 0, TMF8806_CALIB_DATA_SIZE);
 }
 
@@ -154,6 +159,9 @@ bool Adafruit_TMF8806::startMeasuring(bool continuous) {
   uint8_t algoConfig = 0x02; // distanceEnabled = 1
   if (_distanceMode == TMF8806_MODE_5M) {
     algoConfig |= 0x0C; // vcselClkDiv2=1, distanceMode=1
+  } else if (_distanceMode == TMF8806_MODE_10M) {
+    // 10m mode: same as 5m but with bits [7:6] = 2 (0x80)
+    algoConfig |= 0x0C | 0x80; // vcselClkDiv2=1, distanceMode=1, 10m bits
   } else if (_distanceMode == TMF8806_MODE_SHORT_RANGE) {
     algoConfig = 0x00; // distanceEnabled = 0 for short range only
   }
@@ -1038,8 +1046,236 @@ uint16_t Adafruit_TMF8806::getMaxDistance() {
       return TMF8806_MAX_SHORT_RANGE;
     case TMF8806_MODE_5M:
       return TMF8806_MAX_5M;
+    case TMF8806_MODE_10M:
+      return TMF8806_MAX_10M;
     case TMF8806_MODE_2_5M:
     default:
       return TMF8806_MAX_2_5M;
   }
+}
+
+// ============================================================================
+// Firmware download for 10m mode
+// ============================================================================
+
+/*!
+ * @brief Calculate bootloader checksum for a packet
+ * @param data Pointer to packet data (excluding checksum)
+ * @param len Length of data
+ * @return Checksum byte (sum XOR 0xFF)
+ */
+uint8_t Adafruit_TMF8806::bootloaderChecksum(const uint8_t* data, uint8_t len) {
+  uint8_t sum = 0;
+  for (uint8_t i = 0; i < len; i++) {
+    sum += data[i];
+  }
+  return sum ^ 0xFF;
+}
+
+/*!
+ * @brief Wait for bootloader command to complete
+ * @param timeoutMs Timeout in milliseconds
+ * @return true if command completed successfully, false on timeout
+ */
+bool Adafruit_TMF8806::waitForBootloaderCmd(uint16_t timeoutMs) {
+  Adafruit_BusIO_Register bl_cmd_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_BL_CMD_STAT);
+
+  uint32_t startMs = millis();
+  while ((millis() - startMs) < timeoutMs) {
+    uint8_t status = bl_cmd_reg.read();
+    if (status == TMF8806_BL_CMD_OK) {
+      return true;
+    }
+    delayMicroseconds(100);
+  }
+  return false;
+}
+
+/*!
+ * @brief Initialize bootloader download sequence
+ * @return true on success, false on failure
+ */
+bool Adafruit_TMF8806::bootloaderDownloadInit() {
+  // Build packet: [cmd, len, seed, checksum]
+  uint8_t packet[4];
+  packet[0] = TMF8806_BL_CMD_DOWNLOAD_INIT;
+  packet[1] = 0x01; // Length = 1 byte (the seed)
+  packet[2] = TMF8806_BL_DOWNLOAD_INIT_SEED;
+  packet[3] = bootloaderChecksum(packet, 3);
+
+  uint8_t reg = TMF8806_REG_BL_CMD_STAT;
+  if (!_i2c_dev->write(packet, 4, true, &reg, 1)) {
+    return false;
+  }
+
+  return waitForBootloaderCmd(100);
+}
+
+/*!
+ * @brief Set RAM address for firmware download
+ * @param addr 16-bit RAM address
+ * @return true on success, false on failure
+ */
+bool Adafruit_TMF8806::bootloaderSetRamAddr(uint16_t addr) {
+  // Build packet: [cmd, len, addr_lo, addr_hi, checksum]
+  uint8_t packet[5];
+  packet[0] = TMF8806_BL_CMD_ADDR_RAM;
+  packet[1] = 0x02; // Length = 2 bytes (address)
+  packet[2] = addr & 0xFF;
+  packet[3] = (addr >> 8) & 0xFF;
+  packet[4] = bootloaderChecksum(packet, 4);
+
+  uint8_t reg = TMF8806_REG_BL_CMD_STAT;
+  if (!_i2c_dev->write(packet, 5, true, &reg, 1)) {
+    return false;
+  }
+
+  return waitForBootloaderCmd(100);
+}
+
+/*!
+ * @brief Write data to RAM via bootloader
+ * @param data Pointer to data buffer
+ * @param len Length of data (max TMF8806_BL_MAX_DATA = 24)
+ * @return true on success, false on failure
+ */
+bool Adafruit_TMF8806::bootloaderWriteRam(const uint8_t* data, uint8_t len) {
+  if (len > TMF8806_BL_MAX_DATA) {
+    len = TMF8806_BL_MAX_DATA;
+  }
+
+  // Build packet: [cmd, len, data..., checksum]
+  uint8_t packet[TMF8806_BL_HEADER + TMF8806_BL_MAX_DATA + TMF8806_BL_FOOTER];
+  packet[0] = TMF8806_BL_CMD_W_RAM;
+  packet[1] = len;
+  memcpy(&packet[2], data, len);
+  packet[2 + len] = bootloaderChecksum(packet, 2 + len);
+
+  uint8_t reg = TMF8806_REG_BL_CMD_STAT;
+  if (!_i2c_dev->write(packet, 3 + len, true, &reg, 1)) {
+    return false;
+  }
+
+  return waitForBootloaderCmd(100);
+}
+
+/*!
+ * @brief Remap RAM and start the patched application
+ * @return true on success, false on failure
+ */
+bool Adafruit_TMF8806::bootloaderRamRemap() {
+  // Build packet: [cmd, len=0, checksum]
+  uint8_t packet[3];
+  packet[0] = TMF8806_BL_CMD_RAMREMAP;
+  packet[1] = 0x00; // No data
+  packet[2] = bootloaderChecksum(packet, 2);
+
+  uint8_t reg = TMF8806_REG_BL_CMD_STAT;
+  if (!_i2c_dev->write(packet, 3, true, &reg, 1)) {
+    return false;
+  }
+
+  // Wait a bit for the app to start
+  delay(10);
+
+  // Check that measurement app is running
+  Adafruit_BusIO_Register appid_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_APPID);
+  return (appid_reg.read() == TMF8806_APP_MEASUREMENT);
+}
+
+/*!
+ * @brief Download firmware patch to enable 10m mode
+ *
+ * This downloads a ~2.9KB firmware patch from PROGMEM to the TMF8806's
+ * RAM. The patch extends the measurement range from 5m to 10m.
+ * Call this after begin() and before using TMF8806_MODE_10M.
+ *
+ * @return true on success, false on failure
+ */
+bool Adafruit_TMF8806::downloadFirmware() {
+  // Switch to bootloader mode
+  Adafruit_BusIO_Register appreqid_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_APPREQID);
+  if (!appreqid_reg.write(TMF8806_APP_BOOTLOADER)) {
+    return false;
+  }
+
+  // Wait for bootloader to be ready
+  delay(10);
+  Adafruit_BusIO_Register appid_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_APPID);
+  uint32_t startMs = millis();
+  while ((millis() - startMs) < 100) {
+    if (appid_reg.read() == TMF8806_APP_BOOTLOADER) {
+      break;
+    }
+    delay(1);
+  }
+  if (appid_reg.read() != TMF8806_APP_BOOTLOADER) {
+    return false;
+  }
+
+  // Initialize download
+  if (!bootloaderDownloadInit()) {
+    return false;
+  }
+
+  // Set RAM start address (low 16 bits of tmf8806_image_start)
+  if (!bootloaderSetRamAddr((uint16_t)(tmf8806_image_start & 0xFFFF))) {
+    return false;
+  }
+
+  // Download firmware in chunks
+  uint8_t chunk[TMF8806_BL_MAX_DATA];
+  uint16_t offset = 0;
+  uint16_t remaining = tmf8806_image_length;
+
+  while (remaining > 0) {
+    uint8_t chunkLen =
+        (remaining > TMF8806_BL_MAX_DATA) ? TMF8806_BL_MAX_DATA : remaining;
+
+    // Copy chunk from PROGMEM
+    for (uint8_t i = 0; i < chunkLen; i++) {
+      chunk[i] = pgm_read_byte(&tmf8806_image[offset + i]);
+    }
+
+    if (!bootloaderWriteRam(chunk, chunkLen)) {
+      return false;
+    }
+
+    offset += chunkLen;
+    remaining -= chunkLen;
+  }
+
+  // Remap RAM and start patched app
+  if (!bootloaderRamRemap()) {
+    return false;
+  }
+
+  _hasFirmwarePatch = true;
+
+  // Re-enable interrupts
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
+  Adafruit_BusIO_RegisterBits int1_status =
+      Adafruit_BusIO_RegisterBits(&int_status_reg, 1, 0);
+  int1_status.write(1); // Clear by writing 1
+
+  Adafruit_BusIO_Register int_enab_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_ENAB);
+  Adafruit_BusIO_RegisterBits int1_enab =
+      Adafruit_BusIO_RegisterBits(&int_enab_reg, 1, 0);
+  int1_enab.write(1); // Enable result interrupt
+
+  return true;
+}
+
+/*!
+ * @brief Check if firmware patch is loaded
+ * @return true if firmware patch has been downloaded, false otherwise
+ */
+bool Adafruit_TMF8806::hasFirmwarePatch() {
+  return _hasFirmwarePatch;
 }
