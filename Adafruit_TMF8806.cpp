@@ -161,7 +161,7 @@ bool Adafruit_TMF8806::startMeasuring(bool continuous) {
     algoConfig |= 0x0C; // vcselClkDiv2=1, distanceMode=1
   } else if (_distanceMode == TMF8806_MODE_10M) {
     // 10m mode: same as 5m but with bits [7:6] = 2 (0x80)
-    algoConfig |= 0x0C | 0x80; // vcselClkDiv2=1, distanceMode=1, 10m bits
+    algoConfig |= 0x0C | 0x40; // vcselClkDiv2=1, distanceMode=1, reserved[6:5]=2 for 10m
   } else if (_distanceMode == TMF8806_MODE_SHORT_RANGE) {
     algoConfig = 0x00; // distanceEnabled = 0 for short range only
   }
