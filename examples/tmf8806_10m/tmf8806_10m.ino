@@ -5,6 +5,11 @@
  * This requires downloading a firmware patch to the sensor which
  * extends the measurement range from 5m to 10m (10600mm max).
  *
+ * NOTE: 10m mode is not fully verified. The firmware patch from the
+ * ams-OSRAM reference driver (v4.14.11) may not actually enable
+ * distances beyond ~5m. A newer firmware image from ams-OSRAM may
+ * be required for true 10m operation.
+ *
  * The firmware patch is stored in PROGMEM (~2.9KB) and downloaded
  * to the sensor's RAM on startup. It needs to be re-downloaded
  * after each power cycle.
@@ -90,8 +95,8 @@ void setup() {
   Serial.println(F("Distance mode: 10m (10600mm max)"));
 
   // Use higher iterations for better accuracy at long range
-  tmf8806.setIterations(1000);
-  Serial.println(F("Iterations: 1000k"));
+  tmf8806.setIterations(4000);
+  Serial.println(F("Iterations: 4000k"));
 
   // Set repetition period (~10Hz)
   tmf8806.setRepetitionPeriod_ms(100);
