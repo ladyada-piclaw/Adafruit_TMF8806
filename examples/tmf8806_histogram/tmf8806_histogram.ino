@@ -112,6 +112,9 @@ void setup() {
   }
   Serial.println(F("TMF8806 Found!"));
 
+  // Stop any ongoing measurement from previous run
+  tmf.stopMeasuring();
+
   // Get version info
   uint8_t major, minor, patch;
   tmf.getVersion(&major, &minor, &patch);
