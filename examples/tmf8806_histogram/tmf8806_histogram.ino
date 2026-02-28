@@ -122,14 +122,6 @@ void setup() {
   Serial.print(F("."));
   Serial.println(patch);
 
-  // Run factory calibration
-  Serial.println(F("Running factory calibration..."));
-  if (tmf.performFactoryCalibration()) {
-    Serial.println(F("Calibration complete!"));
-    tmf.enableCalibration(true);
-  } else {
-    Serial.println(F("Calibration failed, continuing without"));
-  }
 
   printMenu();
 }
