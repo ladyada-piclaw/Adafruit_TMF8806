@@ -691,6 +691,182 @@ bool Adafruit_TMF8806::readSerialNumber(uint8_t* serial, uint8_t len) {
 }
 
 // ============================================================================
+// ============================================================================
+// Histogram support
+// ============================================================================
+
+/*!
+ * @brief Configure histogram data output
+ *
+ * Enables histogram output for the specified type. Histograms are produced
+ * alongside distance measurements and flagged via the diagnostic interrupt.
+ *
+ * @param type Histogram type to enable (electrical cal, proximity, distance,
+ *             pile-up, or pile-up TDC sum)
+ * @return true on success, false on I2C error
+ */
+bool Adafruit_TMF8806::configureHistogram(tmf8806_histogram_type_t type) {
+  _histType = type;
+
+  // Build 5-byte payload: 4-byte bitmask (little-endian) + command 0x30
+  uint32_t bitmask = (1UL << (uint8_t)type);
+  uint8_t payload[5];
+  payload[0] = bitmask & 0xFF;
+  payload[1] = (bitmask >> 8) & 0xFF;
+  payload[2] = (bitmask >> 16) & 0xFF;
+  payload[3] = (bitmask >> 24) & 0xFF;
+  payload[4] = TMF8806_CMD_HIST_CFG;
+
+  // Write to registers 0x0C through 0x10
+  uint8_t reg = 0x0C;
+  if (!_i2c_dev->write(payload, 5, true, &reg, 1)) {
+    return false;
+  }
+
+  // Wait for command acceptance
+  if (!executeCommand(TMF8806_CMD_HIST_CFG, 100)) {
+    return false;
+  }
+
+  // Enable diagnostic interrupt (bit 1)
+  Adafruit_BusIO_Register int_enab_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_ENAB);
+  uint8_t enab = int_enab_reg.read();
+  enab |= TMF8806_INT_DIAGNOSTIC;
+  return int_enab_reg.write(enab);
+}
+
+/*!
+ * @brief Disable histogram data output
+ * @return true on success, false on I2C error
+ */
+bool Adafruit_TMF8806::disableHistogram() {
+  // Bitmask = 0 to disable
+  uint8_t payload[5] = {0, 0, 0, 0, TMF8806_CMD_HIST_CFG};
+
+  uint8_t reg = 0x0C;
+  if (!_i2c_dev->write(payload, 5, true, &reg, 1)) {
+    return false;
+  }
+
+  if (!executeCommand(TMF8806_CMD_HIST_CFG, 100)) {
+    return false;
+  }
+
+  // Disable diagnostic interrupt (bit 1)
+  Adafruit_BusIO_Register int_enab_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_ENAB);
+  uint8_t enab = int_enab_reg.read();
+  enab &= ~TMF8806_INT_DIAGNOSTIC;
+  return int_enab_reg.write(enab);
+}
+
+/*!
+ * @brief Check if histogram data is ready
+ * @return true if histogram ready (bit 1 of INT_STATUS set)
+ */
+bool Adafruit_TMF8806::histogramReady() {
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
+  uint8_t status = int_status_reg.read();
+  return (status & TMF8806_INT_DIAGNOSTIC) != 0;
+}
+
+/*!
+ * @brief Read histogram data from sensor
+ *
+ * Reads the first sub-histogram (128 bins) after a histogram ready interrupt.
+ * The bins array must have space for TMF8806_HISTOGRAM_BINS (128) uint16_t
+ * values.
+ *
+ * @param bins Pointer to array of 128 uint16_t values to fill
+ * @return true on success, false on I2C error or wrong content
+ */
+bool Adafruit_TMF8806::readHistogram(uint16_t* bins) {
+  // Send histogram read command
+  Adafruit_BusIO_Register command_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_COMMAND);
+  if (!command_reg.write(TMF8806_CMD_HIST_READ)) {
+    return false;
+  }
+
+  // Wait for command acceptance
+  if (!executeCommand(TMF8806_CMD_HIST_READ, 100)) {
+    return false;
+  }
+
+  // Read in two chunks: first 64 bins, then second 64 bins
+  // Each chunk is 128 bytes (64 bins x 2 bytes each)
+  uint8_t rawData[128];
+
+  // === First chunk (bins 0-63) ===
+  // Read in reverse order in 32-byte blocks to avoid I2C bank switch at 0x30
+  for (int block = 3; block >= 0; block--) {
+    uint8_t addr = TMF8806_REG_RESULT_NUMBER + (block * 32);
+    if (!_i2c_dev->write_then_read(&addr, 1, &rawData[block * 32], 32)) {
+      return false;
+    }
+  }
+
+  // Convert first 64 bins (little-endian)
+  for (int i = 0; i < 64; i++) {
+    bins[i] = rawData[i * 2] | ((uint16_t)rawData[i * 2 + 1] << 8);
+  }
+
+  // Read STATE register (0x1C) to advance to next chunk
+  uint8_t stateAddr = TMF8806_REG_STATE;
+  uint8_t stateData[4];
+  if (!_i2c_dev->write_then_read(&stateAddr, 1, stateData, 4)) {
+    return false;
+  }
+
+  // === Second chunk (bins 64-127) ===
+  for (int block = 3; block >= 0; block--) {
+    uint8_t addr = TMF8806_REG_RESULT_NUMBER + (block * 32);
+    if (!_i2c_dev->write_then_read(&addr, 1, &rawData[block * 32], 32)) {
+      return false;
+    }
+  }
+
+  // Convert second 64 bins
+  for (int i = 0; i < 64; i++) {
+    bins[64 + i] = rawData[i * 2] | ((uint16_t)rawData[i * 2 + 1] << 8);
+  }
+
+  // Determine scale factor based on histogram type
+  uint8_t scale = 0;
+  if (_histType == TMF8806_HIST_PILEUP) {
+    scale = 1;
+  } else if (_histType == TMF8806_HIST_PILEUP_TDC_SUM) {
+    scale = 2;
+  } else {
+    // For other types, scale is in LSB of last raw bin
+    scale = rawData[126]; // LSB of bin 127 before conversion
+    if (scale > 8)
+      scale = 0; // Sanity check
+  }
+
+  // Apply scale factor
+  for (int i = 0; i < TMF8806_HISTOGRAM_BINS; i++) {
+    bins[i] = bins[i] << scale;
+  }
+
+  // Send CONTINUE command to allow next measurement
+  if (!command_reg.write(TMF8806_CMD_CONTINUE)) {
+    return false;
+  }
+  if (!executeCommand(TMF8806_CMD_CONTINUE, 100)) {
+    return false;
+  }
+
+  // Clear diagnostic interrupt
+  Adafruit_BusIO_Register int_status_reg =
+      Adafruit_BusIO_Register(_i2c_dev, TMF8806_REG_INT_STATUS);
+  int_status_reg.write(TMF8806_INT_DIAGNOSTIC);
+
+  return true;
+}
+
 // Low power
 // ============================================================================
 

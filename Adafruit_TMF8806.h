@@ -49,6 +49,19 @@
 #define TMF8806_CMD_READ_SERIAL 0x47   ///< Read serial number
 #define TMF8806_CMD_STOP 0xFF          ///< Stop measurement
 
+// Histogram support
+#define TMF8806_HISTOGRAM_BINS 128     ///< Bins per histogram
+#define TMF8806_REG_DIAG_INFO 0x1A     ///< Diagnostic info register
+#define TMF8806_REG_RESULT_NUMBER 0x20 ///< Result/histogram data start
+
+// Histogram configure command bytes (written to CMD register area)
+#define TMF8806_CMD_HIST_CFG 0x30  ///< Configure histogram readout
+#define TMF8806_CMD_HIST_READ 0x80 ///< Read histogram command ID
+#define TMF8806_CMD_CONTINUE 0x32  ///< Continue after histogram read
+
+// Interrupt bit for diagnostic (histogram ready)
+#define TMF8806_INT_DIAGNOSTIC 0x02 ///< Bit 1 of INT_STATUS
+
 // Content types
 #define TMF8806_CONTENT_CALIB 0x0A  ///< Calibration data
 #define TMF8806_CONTENT_SERIAL 0x47 ///< Serial number
@@ -123,6 +136,17 @@ typedef enum {
 } tmf8806_gpio_mode_t;
 
 /*!
+ * @brief Histogram type selection
+ */
+typedef enum {
+  TMF8806_HIST_ELECTRICAL_CAL = 1,  ///< Electrical calibration histogram
+  TMF8806_HIST_PROXIMITY = 4,       ///< Proximity histogram
+  TMF8806_HIST_DISTANCE = 7,        ///< Distance histogram
+  TMF8806_HIST_PILEUP = 16,         ///< Pile-up corrected histogram
+  TMF8806_HIST_PILEUP_TDC_SUM = 17, ///< Pile-up corrected TDC sum
+} tmf8806_histogram_type_t;
+
+/*!
  * @brief Measurement result structure
  */
 typedef struct {
@@ -189,6 +213,12 @@ class Adafruit_TMF8806 {
                          uint8_t len = TMF8806_STATE_DATA_SIZE);
   void enableAlgorithmState(bool enable);
 
+  // Histogram
+  bool configureHistogram(tmf8806_histogram_type_t type);
+  bool disableHistogram();
+  bool histogramReady();
+  bool readHistogram(uint16_t* bins);
+
   // Low power
   bool sleep();
   bool wakeup();
@@ -218,6 +248,9 @@ class Adafruit_TMF8806 {
 
   // Last result temperature
   int8_t _lastTemperature; ///< Last measured temperature
+
+  // Histogram state
+  tmf8806_histogram_type_t _histType; ///< Selected histogram type
 
   // Internal methods
   bool startApp();
