@@ -180,6 +180,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4fd5e2b2bf073231e5d1d4d9f4e28ce2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#a4fd5e2b2bf073231e5d1d4d9f4e28ce2">enableAlgorithmState</a> (bool enable)</td></tr>
 <tr class="memdesc:a4fd5e2b2bf073231e5d1d4d9f4e28ce2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable use of algorithm state data in measurements. Requires calibration to also be enabled (factoryCal=1 + algState=1).  <a href="#a4fd5e2b2bf073231e5d1d4d9f4e28ce2">More...</a><br /></td></tr>
 <tr class="separator:a4fd5e2b2bf073231e5d1d4d9f4e28ce2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add9640f651472ba3f233615cde019ff9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#add9640f651472ba3f233615cde019ff9">configureHistogram</a> (<a class="el" href="_adafruit___t_m_f8806_8h.html#aba374c2623af03ae21448a9b4f1f8253">tmf8806_histogram_type_t</a> type)</td></tr>
+<tr class="memdesc:add9640f651472ba3f233615cde019ff9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure histogram data output.  <a href="#add9640f651472ba3f233615cde019ff9">More...</a><br /></td></tr>
+<tr class="separator:add9640f651472ba3f233615cde019ff9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba8701c52c52e4bf5d53df4b26d8793d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#aba8701c52c52e4bf5d53df4b26d8793d">disableHistogram</a> ()</td></tr>
+<tr class="memdesc:aba8701c52c52e4bf5d53df4b26d8793d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable histogram data output.  <a href="#aba8701c52c52e4bf5d53df4b26d8793d">More...</a><br /></td></tr>
+<tr class="separator:aba8701c52c52e4bf5d53df4b26d8793d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d764e66872cc8db7cbf1368d132aa7b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#a0d764e66872cc8db7cbf1368d132aa7b">histogramReady</a> ()</td></tr>
+<tr class="memdesc:a0d764e66872cc8db7cbf1368d132aa7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if histogram data is ready.  <a href="#a0d764e66872cc8db7cbf1368d132aa7b">More...</a><br /></td></tr>
+<tr class="separator:a0d764e66872cc8db7cbf1368d132aa7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa006148ef10bd3433af3c11090c189a1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#aa006148ef10bd3433af3c11090c189a1">readHistogram</a> (uint16_t *bins)</td></tr>
+<tr class="memdesc:aa006148ef10bd3433af3c11090c189a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read histogram data from sensor.  <a href="#aa006148ef10bd3433af3c11090c189a1">More...</a><br /></td></tr>
+<tr class="separator:aa006148ef10bd3433af3c11090c189a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb9d2291075da6c2c7e9b860c9221de6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___t_m_f8806.html#aeb9d2291075da6c2c7e9b860c9221de6">sleep</a> ()</td></tr>
 <tr class="memdesc:aeb9d2291075da6c2c7e9b860c9221de6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Put the sensor into low-power sleep by clearing the PON bit. The sensor draws ~3uA in this state. Call <a class="el" href="class_adafruit___t_m_f8806.html#a6f345fc9a6f2387991782faa71253766" title="Wake the sensor from sleep and restart the measurement application. Equivalent to the wake sequence i...">wakeup()</a> to resume.  <a href="#aeb9d2291075da6c2c7e9b860c9221de6">More...</a><br /></td></tr>
 <tr class="separator:aeb9d2291075da6c2c7e9b860c9221de6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1067,6 +1079,102 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="add9640f651472ba3f233615cde019ff9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add9640f651472ba3f233615cde019ff9">&#9670;&nbsp;</a></span>configureHistogram()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_TMF8806::configureHistogram </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="_adafruit___t_m_f8806_8h.html#aba374c2623af03ae21448a9b4f1f8253">tmf8806_histogram_type_t</a>&#160;</td>
+          <td class="paramname"><em>type</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Configure histogram data output. </p>
+<p>Enables histogram output for the specified type. Histograms are produced alongside distance measurements and flagged via the diagnostic interrupt.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>Histogram type to enable (electrical cal, proximity, distance, pile-up, or pile-up TDC sum) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, false on I2C error </dd></dl>
+
+</div>
+</div>
+<a id="aba8701c52c52e4bf5d53df4b26d8793d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba8701c52c52e4bf5d53df4b26d8793d">&#9670;&nbsp;</a></span>disableHistogram()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_TMF8806::disableHistogram </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Disable histogram data output. </p>
+<dl class="section return"><dt>Returns</dt><dd>true on success, false on I2C error </dd></dl>
+
+</div>
+</div>
+<a id="a0d764e66872cc8db7cbf1368d132aa7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d764e66872cc8db7cbf1368d132aa7b">&#9670;&nbsp;</a></span>histogramReady()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_TMF8806::histogramReady </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if histogram data is ready. </p>
+<dl class="section return"><dt>Returns</dt><dd>true if histogram ready (bit 1 of INT_STATUS set) </dd></dl>
+
+</div>
+</div>
+<a id="aa006148ef10bd3433af3c11090c189a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa006148ef10bd3433af3c11090c189a1">&#9670;&nbsp;</a></span>readHistogram()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Adafruit_TMF8806::readHistogram </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t *&#160;</td>
+          <td class="paramname"><em>bins</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read histogram data from sensor. </p>
+<p>Reads the first sub-histogram (128 bins) after a histogram ready interrupt. The bins array must have space for TMF8806_HISTOGRAM_BINS (128) uint16_t values.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bins</td><td>Pointer to array of 128 uint16_t values to fill </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true on success, false on I2C error or wrong content </dd></dl>
 
 </div>
 </div>

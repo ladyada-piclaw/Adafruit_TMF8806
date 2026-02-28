@@ -1,16 +1,10 @@
 var searchData=
 [
-  ['setalgorithmstate',['setAlgorithmState',['../class_adafruit___t_m_f8806.html#a254c313ede2038c2bbb25407307fe022',1,'Adafruit_TMF8806']]],
-  ['setcalibrationdata',['setCalibrationData',['../class_adafruit___t_m_f8806.html#a7a773b112fe8eeee8c1196c04b117288',1,'Adafruit_TMF8806']]],
-  ['setdistancemode',['setDistanceMode',['../class_adafruit___t_m_f8806.html#a2dd6ccc872f7808418d0651710081bac',1,'Adafruit_TMF8806']]],
-  ['setgpiomode',['setGPIOMode',['../class_adafruit___t_m_f8806.html#ad9e3800aa35e77d0452d036fa064815a',1,'Adafruit_TMF8806']]],
-  ['setiterations',['setIterations',['../class_adafruit___t_m_f8806.html#ae7e5177fcb7fde066189893bb495a824',1,'Adafruit_TMF8806']]],
-  ['setopticalconfig',['setOpticalConfig',['../class_adafruit___t_m_f8806.html#a19db21bf432b3c28b89ec79e3902a2ae',1,'Adafruit_TMF8806']]],
-  ['setrepetitionperiod_5fms',['setRepetitionPeriod_ms',['../class_adafruit___t_m_f8806.html#af4f551259d1d5a198b0abc6f1622e807',1,'Adafruit_TMF8806']]],
-  ['setsnrthreshold',['setSNRThreshold',['../class_adafruit___t_m_f8806.html#adb88d236850a57c6a33176a4d74c06e6',1,'Adafruit_TMF8806']]],
-  ['setspaddeadtime',['setSpadDeadTime',['../class_adafruit___t_m_f8806.html#a3b35a3e4e96f842f04d1861d4db4eb68',1,'Adafruit_TMF8806']]],
-  ['sleep',['sleep',['../class_adafruit___t_m_f8806.html#aeb9d2291075da6c2c7e9b860c9221de6',1,'Adafruit_TMF8806']]],
-  ['startmeasuring',['startMeasuring',['../class_adafruit___t_m_f8806.html#a8d6aab9436d83a1e7a48ff1f8139713f',1,'Adafruit_TMF8806']]],
-  ['status',['status',['../structtmf8806__result__t.html#ac13df607b6c3e70cc04de91a933e4117',1,'tmf8806_result_t']]],
-  ['stopmeasuring',['stopMeasuring',['../class_adafruit___t_m_f8806.html#a82784935ed5b3e6e9eddc3bf1ad06bb4',1,'Adafruit_TMF8806']]]
+  ['readdistance',['readDistance',['../class_adafruit___t_m_f8806.html#a2050106cc043423ae5241fb3261cc0f0',1,'Adafruit_TMF8806']]],
+  ['readhistogram',['readHistogram',['../class_adafruit___t_m_f8806.html#aa006148ef10bd3433af3c11090c189a1',1,'Adafruit_TMF8806']]],
+  ['readresult',['readResult',['../class_adafruit___t_m_f8806.html#a1d000c252dc8c75bcaf395c76e2daf46',1,'Adafruit_TMF8806']]],
+  ['readserialnumber',['readSerialNumber',['../class_adafruit___t_m_f8806.html#addf0ed504ea1bb0817fd5757eaa50947',1,'Adafruit_TMF8806']]],
+  ['referencehits',['referenceHits',['../structtmf8806__result__t.html#ad30845e62b8b8ce0ac6860759c6da8bd',1,'tmf8806_result_t']]],
+  ['reliability',['reliability',['../structtmf8806__result__t.html#acfd4372d10c7dafc02824d5141f45604',1,'tmf8806_result_t']]],
+  ['reset',['reset',['../class_adafruit___t_m_f8806.html#a1ab3e1c8b75b0960a9106666d18efb85',1,'Adafruit_TMF8806']]]
 ];

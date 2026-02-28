@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['objecthits',['objectHits',['../structtmf8806__result__t.html#ae906532a159762b383bedc0763a8924b',1,'tmf8806_result_t']]]
+  ['histogramready',['histogramReady',['../class_adafruit___t_m_f8806.html#a0d764e66872cc8db7cbf1368d132aa7b',1,'Adafruit_TMF8806']]]
 ];
