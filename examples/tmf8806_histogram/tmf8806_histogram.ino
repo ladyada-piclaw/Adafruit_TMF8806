@@ -203,8 +203,10 @@ void loop() {
     if (tmf.histogramReady()) {
       if (tmf.readHistogram(histogramBins)) {
         printHistogram(getHistTypeName(currentHistType));
-        // Re-arm histogram for next measurement cycle
+        // Stop, reconfigure, and restart for next histogram
+        tmf.stopMeasuring();
         tmf.configureHistogram(currentHistType);
+        tmf.startMeasuring(true);
       } else {
         Serial.println(F("Failed to read histogram"));
       }
