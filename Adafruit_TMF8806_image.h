@@ -11,6 +11,9 @@
 #define ADAFRUIT_TMF8806_IMAGE_H
 
 #include <Arduino.h>
+#ifndef PROGMEM
+#define PROGMEM
+#endif
 
 extern const unsigned long tmf8806_image_termination;
 extern const unsigned long tmf8806_image_start;

@@ -20,7 +20,9 @@
 
 #include "Adafruit_TMF8806.h"
 
+#ifdef __AVR__
 #include <avr/pgmspace.h>
+#endif
 
 #include "Adafruit_TMF8806_image.h"
 
